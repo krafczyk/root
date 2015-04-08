@@ -148,8 +148,11 @@ namespace TMVA {
       return *this;
    }
 
-   // Shortcut
-   inline MsgLogger& Endl(MsgLogger& ml) { return MsgLogger::Endmsg(ml); }
+   // Although the proper definition of "Endl" as a function pointer
+   // would be nicer C++-wise, it introduces some "unused variable"
+   // warnings so let's use the #define definition after all...
+   //   static MsgLogger& ( *Endl )( MsgLogger& ) = &MsgLogger::Endmsg;
+#define Endl MsgLogger::Endmsg
 
 }
 

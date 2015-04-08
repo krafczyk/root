@@ -58,7 +58,6 @@
 #endif
 
 namespace TMVA {
-   class DataSet;
    class DecisionTreeNode;
    class SeparationBase;
 

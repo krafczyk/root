@@ -52,7 +52,7 @@ ClassImp(TMVA::VariableNormalizeTransform)
 
 //_______________________________________________________________________
 TMVA::VariableNormalizeTransform::VariableNormalizeTransform( DataSetInfo& dsi )
-: VariableTransformBase( dsi, Types::kNormalized, "Norm" )
+   : VariableTransformBase( dsi, Types::kNormalized, "Norm" )
 { 
    // constructor
 }
@@ -81,7 +81,7 @@ void TMVA::VariableNormalizeTransform::Initialize()
 }
 
 //_______________________________________________________________________
-Bool_t TMVA::VariableNormalizeTransform::PrepareTransformation (const std::vector<Event*>& events)
+Bool_t TMVA::VariableNormalizeTransform::PrepareTransformation( const std::vector<Event*>& events )
 {
    // prepare transformation
    if (!IsEnabled() || IsCreated()) return kTRUE;
@@ -129,10 +129,10 @@ const TMVA::Event* TMVA::VariableNormalizeTransform::Transform( const TMVA::Even
    std::vector<Char_t>::iterator itMask = mask.begin();
    for ( std::vector<Float_t>::iterator itInp = input.begin(), itInpEnd = input.end(); itInp != itInpEnd; ++itInp) { // loop over input variables
       if( (*itMask) ){
-         ++iidx;
-         ++itMask;
-         // don't put any value into output if the value is masked
-         continue;
+	 ++iidx;
+	 ++itMask;
+	 // don't put any value into output if the value is masked
+	 continue;
       }
 
       Float_t val = (*itInp);
@@ -154,7 +154,7 @@ const TMVA::Event* TMVA::VariableNormalizeTransform::Transform( const TMVA::Even
 }
 
 //_______________________________________________________________________
-const TMVA::Event* TMVA::VariableNormalizeTransform::InverseTransform(const TMVA::Event* const ev, Int_t cls ) const
+const TMVA::Event* TMVA::VariableNormalizeTransform::InverseTransform( const TMVA::Event* const ev, Int_t cls ) const
 {
    // apply the inverse transformation
    if (!IsCreated()) Log() << kFATAL << "Transformation not yet created" << Endl;
@@ -198,7 +198,7 @@ const TMVA::Event* TMVA::VariableNormalizeTransform::InverseTransform(const TMVA
 }
 
 //_______________________________________________________________________
-void TMVA::VariableNormalizeTransform::CalcNormalizationParams( const std::vector< Event*>& events )
+void TMVA::VariableNormalizeTransform::CalcNormalizationParams( const std::vector<Event*>& events )
 {
    // compute offset and scale from min and max
    if (events.size() <= 1) 
@@ -226,7 +226,7 @@ void TMVA::VariableNormalizeTransform::CalcNormalizationParams( const std::vecto
 
    std::vector<Event*>::const_iterator evIt = events.begin();
    for (;evIt!=events.end();evIt++) { // loop over all events
-      const TMVA::Event* event = (*evIt);   // get the event
+      TMVA::Event* event = (*evIt);   // get the event
 
       UInt_t cls = (*evIt)->GetClass(); // get the class of this event
 
@@ -241,17 +241,17 @@ void TMVA::VariableNormalizeTransform::CalcNormalizationParams( const std::vecto
       for ( std::vector<Float_t>::iterator itInp = input.begin(), itInpEnd = input.end(); itInp != itInpEnd; ++itInp) { // loop over input variables
          Float_t val = (*itInp);
 
-         if( minVector.at(iidx) > val ) minVector.at(iidx) = val;
-         if( maxVector.at(iidx) < val ) maxVector.at(iidx) = val;
+	 if( minVector.at(iidx) > val ) minVector.at(iidx) = val;
+	 if( maxVector.at(iidx) < val ) maxVector.at(iidx) = val;
 
-         if (nCls != 1) { // in case more than one class exists, compute min and max as well for all classes together
+	 if (nCls != 1) { // in case more than one class exists, compute min and max as well for all classes together
             if (minVectorAll.at(iidx) > val) minVectorAll.at(iidx) = val;
             if (maxVectorAll.at(iidx) < val) maxVectorAll.at(iidx) = val;
          }
 
-         ++iidx;
+	 ++iidx;
+         }
       }
-   }
 
    return;
 }
@@ -294,7 +294,7 @@ std::vector<TString>* TMVA::VariableNormalizeTransform::GetTransformationStrings
 //_______________________________________________________________________
 void TMVA::VariableNormalizeTransform::WriteTransformationToStream( std::ostream& o ) const
 {
-   // write the transformation to the stream
+   // write the decorrelation matrix to the stream
    o << "# min max for all variables for all classes one after the other and as a last entry for all classes together" << std::endl;
 
    Int_t numC = GetNClasses()+1;
@@ -365,31 +365,31 @@ void TMVA::VariableNormalizeTransform::ReadFromXML( void* trfnode )
 
       void* ch = gTools().GetChild( trfnode, "Class" );
       while(ch) {
-         Int_t ci = 0;
-         gTools().ReadAttr(ch, "ClassIndex", ci);
-         classindex = UInt_t(ci);
+	 Int_t ci = 0;
+	 gTools().ReadAttr(ch, "ClassIndex", ci);
+	 classindex = UInt_t(ci);
 
-         fMin.resize(classindex+1);
-         fMax.resize(classindex+1);
-    
-         fMin[classindex].resize(size,Float_t(0));
-         fMax[classindex].resize(size,Float_t(0));
+	 fMin.resize(classindex+1);
+	 fMax.resize(classindex+1);
+	 
+	 fMin[classindex].resize(size,Float_t(0));
+	 fMax[classindex].resize(size,Float_t(0));
 
-         void* clch = gTools().GetChild( ch );
-         while(clch) {
-            TString nodeName(gTools().GetName(clch));
-            if(nodeName=="Ranges") {
-               void* varch = gTools().GetChild( clch );
-               while(varch) {
-                  gTools().ReadAttr(varch, "Index", idx);
-                  gTools().ReadAttr(varch, "Min",      fMin[classindex][idx]);
-                  gTools().ReadAttr(varch, "Max",      fMax[classindex][idx]);
-                  varch = gTools().GetNextChild( varch );
-               }
-            }
-            clch = gTools().GetNextChild( clch );
-         }
-         ch = gTools().GetNextChild( ch );
+	 void* clch = gTools().GetChild( ch );
+	 while(clch) {
+	    TString nodeName(gTools().GetName(clch));
+	    if(nodeName=="Ranges") {
+	       void* varch = gTools().GetChild( clch );
+	       while(varch) {
+		  gTools().ReadAttr(varch, "Index", idx);
+		  gTools().ReadAttr(varch, "Min",      fMin[classindex][idx]);
+		  gTools().ReadAttr(varch, "Max",      fMax[classindex][idx]);
+		  varch = gTools().GetNextChild( varch );
+	       }
+	    }
+	    clch = gTools().GetNextChild( clch );
+	 }
+	 ch = gTools().GetNextChild( ch );
       }
       SetCreated();
       return;
@@ -520,7 +520,7 @@ void TMVA::VariableNormalizeTransform::ReadTransformationFromStream( std::istrea
 }
 
 //_______________________________________________________________________
-void TMVA::VariableNormalizeTransform::PrintTransformation( std::ostream& /* o */ ) 
+void TMVA::VariableNormalizeTransform::PrintTransformation( ostream& /* o */ ) 
 {
    // prints the transformation ranges
 
@@ -588,8 +588,7 @@ void TMVA::VariableNormalizeTransform::MakeFunction( std::ostream& fout, const T
       fout << "   const int nVar = " << nVar << ";" << std::endl << std::endl;
       fout << "   // get indices of used variables" << std::endl;
       VariableTransformBase::MakeFunction(fout, fcncName, 0, trCounter, 0 );
-      fout << "   static std::vector<double> dv;" << std::endl; // simply made it static so it doesn't need to be re-booked every time
-      fout << "   dv.resize(nVar);" << std::endl; 
+      fout << "   std::vector<double> dv(nVar);" << std::endl;
       fout << "   for (int ivar=0; ivar<nVar; ivar++) dv[ivar] = iv[indicesGet.at(ivar)];" << std::endl;
 
       fout << "   for (int ivar=0;ivar<"<<nVar<<";ivar++) {" << std::endl;

@@ -28,19 +28,18 @@
 #include <vector>
 
 #include "TH1.h"
-#include "TH2.h"
 #include "TGraph.h"
 
 #include "TMVA/Results.h"
 #include "TMVA/MsgLogger.h"
 
 //_______________________________________________________________________
-TMVA::Results::Results( const DataSetInfo* dsi, TString resultsName ) 
+TMVA::Results::Results( const DataSetInfo* dsi ) 
    : fTreeType(Types::kTraining),
      fDsi(dsi),
      fStorage( new TList() ),
      fHistAlias( new std::map<TString, TObject*> ),
-     fLogger( new MsgLogger(Form("Results%s",resultsName.Data()), kINFO) )
+     fLogger( new MsgLogger("Results", kINFO) )
 {
    // constructor
    fStorage->SetOwner();
@@ -92,28 +91,12 @@ TObject* TMVA::Results::GetObject(const TString & alias) const
 }
 
 
-Bool_t TMVA::Results::DoesExist(const TString & alias) const
-{
-   TObject* test = GetObject(alias);
-   
-   return test;
-}
-
 //_______________________________________________________________________
 TH1* TMVA::Results::GetHist(const TString & alias) const 
 {
-   TH1* out=dynamic_cast<TH1*>(GetObject(alias));
-   if (!out) Log() <<kWARNING << "You have asked for histogram " << alias << " which does not seem to exist in *Results* .. better don't use it " << Endl;
-   return out;
+   return (TH1*)GetObject(alias);
 }
 
-//_______________________________________________________________________
-TH2* TMVA::Results::GetHist2D(const TString & alias) const 
-{
-   TH2* out=dynamic_cast<TH2*>(GetObject(alias));
-   if (!out) Log() <<kWARNING << "You have asked for 2D histogram " << alias << " which does not seem to exist in *Results* .. better don't use it " << Endl;
-   return out;
-}
 //_______________________________________________________________________
 TGraph* TMVA::Results::GetGraph(const TString & alias) const 
 {

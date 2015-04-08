@@ -83,7 +83,7 @@ namespace TMVA {
       VariableTransformBase* AddTransformation(VariableTransformBase*, Int_t cls );
       const TList& GetTransformationList()   const { return fTransformations; }
       Int_t        GetNumOfTransformations() const { return fTransformations.GetSize(); }
-      const std::vector<Event*>* CalcTransformations( const std::vector<Event*>&, Bool_t createNewVector = kFALSE );
+      std::vector<Event*>* CalcTransformations( const std::vector<Event*>&, Bool_t createNewVector = kFALSE );
       
       void         CalcStats( const std::vector<Event*>& events );
       void         AddStats ( Int_t k, UInt_t ivar, Double_t mean, Double_t rms, Double_t min, Double_t max );
@@ -119,10 +119,10 @@ namespace TMVA {
 
    private:
       
-      //      std::vector<TMVA::Event*>* TransformCollection( VariableTransformBase* trf,
-      //                                                Int_t cls,
-      //                                                std::vector<TMVA::Event*>* events,
-      //                                                Bool_t replace ) const;
+      std::vector<TMVA::Event*>* TransformCollection( VariableTransformBase* trf,
+                                                      Int_t cls,
+                                                      std::vector<TMVA::Event*>* events,
+                                                      Bool_t replace ) const;
       
       const TMVA::VariableInfo& Variable(UInt_t ivar) const { return fDataSetInfo.GetVariableInfos().at(ivar); }
       const TMVA::VariableInfo& Target  (UInt_t itgt) const { return fDataSetInfo.GetTargetInfos()[itgt]; }

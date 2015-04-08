@@ -121,7 +121,7 @@ Int_t TMVA::Node::CountMeAndAllDaughters() const
 
 // print a node
 //_______________________________________________________________________
-std::ostream& TMVA::operator<<( std::ostream& os, const TMVA::Node& node )
+ostream& TMVA::operator<<( ostream& os, const TMVA::Node& node )
 { 
    // output operator for a node  
    node.Print(os);
@@ -129,7 +129,7 @@ std::ostream& TMVA::operator<<( std::ostream& os, const TMVA::Node& node )
 }
 
 //_______________________________________________________________________
-std::ostream& TMVA::operator<<( std::ostream& os, const TMVA::Node* node )
+ostream& TMVA::operator<<( ostream& os, const TMVA::Node* node )
 { 
    // output operator with a pointer to the node (which still prints the node itself)
    if (node!=NULL) node->Print(os);
@@ -171,7 +171,7 @@ void TMVA::Node::ReadXML( void* node,  UInt_t tmva_Version_Code )
       if (n->GetPos()=='l')     { this->SetLeft(n);  }
       else if(n->GetPos()=='r') { this->SetRight(n); }
       else { 
-         std::cout << "neither left nor right" << std::endl;
+	 std::cout << "neither left nor right" << std::endl;
       }
       ch = gTools().GetNextChild(ch);
    }

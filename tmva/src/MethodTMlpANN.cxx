@@ -27,19 +27,19 @@
 //_______________________________________________________________________
 /* Begin_Html
 
-   This is the TMVA TMultiLayerPerceptron interface class. It provides the
-   training and testing the ROOT internal MLP class in the TMVA framework.<be>
+  This is the TMVA TMultiLayerPerceptron interface class. It provides the
+  training and testing the ROOT internal MLP class in the TMVA framework.<be>
 
-   Available learning methods:<br>
-   <ul>
-   <li>Stochastic      </li>
-   <li>Batch           </li>
-   <li>SteepestDescent </li>
-   <li>RibierePolak    </li>
-   <li>FletcherReeves  </li>
-   <li>BFGS            </li>
-   </ul>
-   End_Html */
+  Available learning methods:<br>
+  <ul>
+  <li>Stochastic      </li>
+  <li>Batch           </li>
+  <li>SteepestDescent </li>
+  <li>RibierePolak    </li>
+  <li>FletcherReeves  </li>
+  <li>BFGS            </li>
+  </ul>
+End_Html */
 //
 //  See the TMultiLayerPerceptron class description
 //  for details on this ANN.
@@ -65,15 +65,13 @@
 #include "TMVA/Tools.h"
 #endif
 
-using std::atoi;
-
 // some additional TMlpANN options
 const Bool_t EnforceNormalization__=kTRUE;
 #if ROOT_VERSION_CODE > ROOT_VERSION(5,13,06)
-//const TMultiLayerPerceptron::ELearningMethod LearningMethod__= TMultiLayerPerceptron::kStochastic;
+const TMultiLayerPerceptron::ELearningMethod LearningMethod__= TMultiLayerPerceptron::kStochastic;
 // const TMultiLayerPerceptron::ELearningMethod LearningMethod__= TMultiLayerPerceptron::kBatch;
 #else
-//const TMultiLayerPerceptron::LearningMethod LearningMethod__= TMultiLayerPerceptron::kStochastic;
+const TMultiLayerPerceptron::LearningMethod LearningMethod__= TMultiLayerPerceptron::kStochastic;
 #endif
 
 REGISTER_METHOD(TMlpANN)
@@ -81,14 +79,13 @@ REGISTER_METHOD(TMlpANN)
 ClassImp(TMVA::MethodTMlpANN)
 
 //_______________________________________________________________________
-   TMVA::MethodTMlpANN::MethodTMlpANN( const TString& jobName,
-                                       const TString& methodTitle,
-                                       DataSetInfo& theData,
-                                       const TString& theOption,
-                                       TDirectory* theTargetDir) :
+TMVA::MethodTMlpANN::MethodTMlpANN( const TString& jobName,
+                                    const TString& methodTitle,
+                                    DataSetInfo& theData,
+                                    const TString& theOption,
+                                    TDirectory* theTargetDir) :
    TMVA::MethodBase( jobName, Types::kTMlpANN, methodTitle, theData, theOption, theTargetDir ),
    fMLP(0),
-   fLocalTrainingTree(0),
    fNcycles(100),
    fValidationFraction(0.5),
    fLearningMethod( "" )
@@ -102,7 +99,6 @@ TMVA::MethodTMlpANN::MethodTMlpANN( DataSetInfo& theData,
                                     TDirectory* theTargetDir ) :
    TMVA::MethodBase( Types::kTMlpANN, theData, theWeightFile, theTargetDir ),
    fMLP(0),
-   fLocalTrainingTree(0),
    fNcycles(100),
    fValidationFraction(0.5),
    fLearningMethod( "" )
@@ -429,7 +425,7 @@ void  TMVA::MethodTMlpANN::ReadWeightsFromXML( void* wghtnode )
 }
  
 //_______________________________________________________________________
-void  TMVA::MethodTMlpANN::ReadWeightsFromStream( std::istream& istr )
+void  TMVA::MethodTMlpANN::ReadWeightsFromStream( istream& istr )
 {
    // read weights from stream
    // since the MLP can not read from the stream, we

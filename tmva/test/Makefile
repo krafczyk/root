@@ -5,8 +5,8 @@
 
 MAKEFLAGS = --no-print-directory -r -s
 
-INCLUDE = -I$(TMVASYS)/ $(shell root-config --cflags)
-LIBS    = -L$(TMVASYS)/lib -lTMVA.1 $(shell root-config --libs) -lMLP -lTreePlayer -lMinuit
+INCLUDE = -I../ $(shell root-config --cflags)
+LIBS    = -L../lib -lTMVA.1 $(shell root-config --libs) -lMLP -lTreePlayer -lMinuit
 
 BINS = TMVAClassification \
 	TMVAClassificationCategory \
@@ -20,9 +20,9 @@ BINS = TMVAClassification \
 
 UNITTESTS = EVENT CREATE_DATASET 
 
-TMVALIB = $(TMVASYS)/lib/libTMVA.1.so
+TMVALIB = ../lib/libTMVA.1.so
 
-PUBLISH = $(TMVASYS)/www
+PUBLISH = ../www
 
 include nightlyClassifiers.make
 
@@ -38,41 +38,41 @@ profileRegression: TMVARegression
 	rm -f regression.profile
 	rm -f callgrindRegression.log
 	valgrind  --tool=callgrind --callgrind-out-file=regression.profile  ./TMVARegression | tee callgrindRegression.log
-	callgrind_annotate --inclusive=yes --tree=both --auto=yes regression.profile $(TMVASYS)/src/*.cxx $(TMVASYS)/src/*.h
+	callgrind_annotate --inclusive=yes --tree=both --auto=yes regression.profile ../src/*.cxx ../src/*.h
 	@echo "to see the profile do \"kcachegrind regression.profile\""
 
 profileClassification: TMVAClassification
 	rm -f classification.profile
 	rm -f callgrindClassification.log
 	valgrind  --tool=callgrind --callgrind-out-file=classification.profile  ./TMVAClassification | tee callgrindClassification.log
-	callgrind_annotate --inclusive=yes --tree=both --auto=yes classification.profile $(TMVASYS)/src/*.cxx $(TMVASYS)/src/*.h
+	callgrind_annotate --inclusive=yes --tree=both --auto=yes classification.profile ../src/*.cxx ../src/*.h
 	@echo "to see the profile do \"kcachegrind classification.profile\""
 
 
 clean:
 	rm -f $(BINS)
 
-$(TMVALIB): $(TMVASYS)/src/*.cxx $(TMVASYS)/inc/*.h
+$(TMVALIB): ../src/*.cxx ../inc/*.h
 	$(MAKE) -C ..
 
 install:
 	@mkdir -p $(PUBLISH)
-	@cp -u $(TMVASYS)/test/pad.inc $(PUBLISH)
-	@cp -u $(TMVASYS)/test/tabView.js $(PUBLISH)
-	@cp -u $(TMVASYS)/test/tmva_nightly.css $(PUBLISH)
-	@cp -u $(TMVASYS)/test/index.php $(PUBLISH)
-	@cp -u $(TMVASYS)/macros/tmva_logo.gif $(PUBLISH)
+	@cp -u ../test/pad.inc $(PUBLISH)
+	@cp -u ../test/tabView.js $(PUBLISH)
+	@cp -u ../test/tmva_nightly.css $(PUBLISH)
+	@cp -u ../test/index.php $(PUBLISH)
+	@cp -u ../macros/tmva_logo.gif $(PUBLISH)
 
-ut: 	$(TMVASYS)/test/stressTMVA $(UNITTESTS)
+ut: 	../test/stressTMVA $(UNITTESTS)
 	@echo "UNITTESTS FINISHED"
 
 $(UNITTESTS):
 	@echo "unit $@ -------------------------------------------- "
-	$(TMVASYS)/test/stressTMVA $@
+	../test/stressTMVA $@
 
 
-$(TMVASYS)/test/stressTMVA: $(TMVASYS)/test/stressTMVA.cxx
-	make -C $(TMVASYS)/test/
+../test/stressTMVA: ../test/stressTMVA.cxx
+	make -C ../test/
 
 
 TMVA.root: $(TMVALIB) TMVAClassification nightlyClassifiers.make
@@ -81,13 +81,13 @@ TMVA.root: $(TMVALIB) TMVAClassification nightlyClassifiers.make
 TMVApp.root: TMVAClassificationApplication TMVA.root
 	./TMVAClassificationApplication $(TESTCLASSIFIERS)
 
-$(PUBLISH)/uptodate: install TMVApp.root $(TMVASYS)/test/CompareHistsTrainAndApplied.C
-	root -l -b -q $(TMVASYS)/test/CompareHistsTrainAndApplied.C
+$(PUBLISH)/uptodate: install TMVApp.root ../test/CompareHistsTrainAndApplied.C
+	root -l -b -q ../test/CompareHistsTrainAndApplied.C
 	touch $@
 
 
 
-$(BINS): % : %.cxx $(TMVASYS)/inc/*.h
+$(BINS): % : %.cxx ../inc/*.h
 	@echo -n "Building $@ ... "
 	$(CXX) $(CCFLAGS) $< $(INCLUDE) $(LIBS) -g -o $@
 	@echo "Done"

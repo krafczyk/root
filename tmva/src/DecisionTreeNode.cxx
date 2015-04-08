@@ -39,7 +39,6 @@
 #include <algorithm>
 #include <exception>
 #include <iomanip>
-#include <limits>
 
 #include "TMVA/MsgLogger.h"
 #include "TMVA/DecisionTreeNode.h"
@@ -52,7 +51,7 @@ ClassImp(TMVA::DecisionTreeNode)
 
 TMVA::MsgLogger* TMVA::DecisionTreeNode::fgLogger = 0;
 bool     TMVA::DecisionTreeNode::fgIsTraining = false;
-UInt_t   TMVA::DecisionTreeNode::fgTmva_Version_Code = 0;
+
 //_______________________________________________________________________
 TMVA::DecisionTreeNode::DecisionTreeNode()
    : TMVA::Node(),
@@ -68,7 +67,7 @@ TMVA::DecisionTreeNode::DecisionTreeNode()
    // constructor of an essentially "empty" node floating in space
    if (!fgLogger) fgLogger = new TMVA::MsgLogger( "DecisionTreeNode" );
 
-   if (DecisionTreeNode::fgIsTraining){
+   if (fgIsTraining){
       fTrainInfo = new DTNodeTrainingInfo();
       //std::cout << "Node constructor with TrainingINFO"<<std::endl;
    }
@@ -93,7 +92,7 @@ TMVA::DecisionTreeNode::DecisionTreeNode(TMVA::Node* p, char pos)
    // constructor of a daughter node as a daughter of 'p'
    if (!fgLogger) fgLogger = new TMVA::MsgLogger( "DecisionTreeNode" );
 
-   if (DecisionTreeNode::fgIsTraining){
+   if (fgIsTraining){
       fTrainInfo = new DTNodeTrainingInfo();
       //std::cout << "Node constructor with TrainingINFO"<<std::endl;
    }
@@ -127,7 +126,7 @@ TMVA::DecisionTreeNode::DecisionTreeNode(const TMVA::DecisionTreeNode &n,
    if (n.GetRight() == 0 ) this->SetRight(NULL);
    else this->SetRight( new DecisionTreeNode( *((DecisionTreeNode*)(n.GetRight())),this));
 
-   if (DecisionTreeNode::fgIsTraining){
+   if (fgIsTraining){
       fTrainInfo = new DTNodeTrainingInfo(*(n.fTrainInfo));
       //std::cout << "Node constructor with TrainingINFO"<<std::endl;
    }
@@ -151,9 +150,9 @@ Bool_t TMVA::DecisionTreeNode::GoesRight(const TMVA::Event & e) const
    Bool_t result;
    // first check if the fisher criterium is used or ordinary cuts:
    if (GetNFisherCoeff() == 0){
-   
-      result = (e.GetValue(this->GetSelector()) >= this->GetCutValue() );
-   
+      
+      result = (e.GetValue(this->GetSelector()) > this->GetCutValue() );
+
    }else{
       
       Double_t fisher = this->GetFisherCoeff(fFisherCoeff.size()-1); // the offset
@@ -196,7 +195,7 @@ void TMVA::DecisionTreeNode::SetPurity( void )
 
 // print a node
 //_______________________________________________________________________
-void TMVA::DecisionTreeNode::Print(std::ostream& os) const
+void TMVA::DecisionTreeNode::Print(ostream& os) const
 {
    //print the node
    os << "< ***  "  << std::endl;
@@ -227,7 +226,7 @@ void TMVA::DecisionTreeNode::Print(std::ostream& os) const
 }
 
 //_______________________________________________________________________
-void TMVA::DecisionTreeNode::PrintRec(std::ostream& os) const
+void TMVA::DecisionTreeNode::PrintRec(ostream& os) const
 {
    //recursively print the node and its daughters (--> print the 'tree')
 
@@ -258,10 +257,10 @@ void TMVA::DecisionTreeNode::PrintRec(std::ostream& os) const
 }
 
 //_______________________________________________________________________
-Bool_t TMVA::DecisionTreeNode::ReadDataRecord( std::istream& is, UInt_t tmva_Version_Code )
+Bool_t TMVA::DecisionTreeNode::ReadDataRecord( istream& is, UInt_t tmva_Version_Code )
 {
    // Read the data block
-   fgTmva_Version_Code=tmva_Version_Code;
+
    string tmp;
 
    Float_t cutVal, cutType, nsig, nbkg, nEv, nsig_unweighted, nbkg_unweighted, nEv_unweighted;
@@ -364,7 +363,7 @@ void TMVA::DecisionTreeNode::ResetValidationData( ) {
 }
 
 //_______________________________________________________________________
-void TMVA::DecisionTreeNode::PrintPrune( std::ostream& os ) const {
+void TMVA::DecisionTreeNode::PrintPrune( ostream& os ) const {
    // printout of the node (can be read in with ReadDataRecord)
 
    os << "----------------------" << std::endl
@@ -376,7 +375,7 @@ void TMVA::DecisionTreeNode::PrintPrune( std::ostream& os ) const {
 }
 
 //_______________________________________________________________________
-void TMVA::DecisionTreeNode::PrintRecPrune( std::ostream& os ) const {
+void TMVA::DecisionTreeNode::PrintRecPrune( ostream& os ) const {
    // recursive printout of the node and its daughters
 
    this->PrintPrune(os);
@@ -399,7 +398,7 @@ Float_t TMVA::DecisionTreeNode::GetSampleMin(UInt_t ivar) const {
    // that pass/end up in this node
    if (fTrainInfo && ivar < fTrainInfo->fSampleMin.size()) return fTrainInfo->fSampleMin[ivar];
    else *fgLogger << kFATAL << "You asked for Min of the event sample in node for variable "
-                  << ivar << " that is out of range" << Endl;
+                 << ivar << " that is out of range" << Endl;
    return -9999;
 }
 
@@ -409,7 +408,7 @@ Float_t TMVA::DecisionTreeNode::GetSampleMax(UInt_t ivar) const {
    // that pass/end up in this node
    if (fTrainInfo && ivar < fTrainInfo->fSampleMin.size()) return fTrainInfo->fSampleMax[ivar];
    else *fgLogger << kFATAL << "You asked for Max of the event sample in node for variable "
-                  << ivar << " that is out of range" << Endl;
+                 << ivar << " that is out of range" << Endl;
    return 9999;
 }
 

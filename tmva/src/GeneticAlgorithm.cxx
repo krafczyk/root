@@ -50,25 +50,25 @@ ClassImp(TMVA::GeneticAlgorithm)
 //_______________________________________________________________________
 TMVA::GeneticAlgorithm::GeneticAlgorithm( IFitterTarget& target, Int_t populationSize, 
                                           const std::vector<Interval*>& ranges, UInt_t seed )
-: fConvCounter(-1),
-   fFitterTarget( target ),
-   fConvValue(0.),
-   fLastResult(DBL_MAX),
-   fSpread(0.1),
-   fMirror(kTRUE),
-   fFirstTime(kTRUE),
-   fMakeCopies(kFALSE),
-   fPopulationSize(populationSize),
-   fRanges( ranges ),
-   fPopulation(ranges, populationSize, seed),
-   fBestFitness(DBL_MAX),
-   fLogger( new MsgLogger("GeneticAlgorithm") )
+   : fConvCounter(-1),
+     fFitterTarget( target ),
+     fConvValue(0.),
+     fLastResult(DBL_MAX),
+     fSpread(0.1),
+     fMirror(kTRUE),
+     fFirstTime(kTRUE),
+     fMakeCopies(kFALSE),
+     fPopulationSize(populationSize),
+     fRanges( ranges ),
+     fPopulation(ranges, populationSize, seed),
+     fBestFitness(DBL_MAX),
+     fLogger( new MsgLogger("GeneticAlgorithm") )
 {
    // Constructor
    // Parameters: 
    //     int populationSize : defines the number of "Individuals" which are created and tested 
    //                          within one Generation (Iteration of the Evolution)
-   //     std::vector<TMVA::Interval*> ranges : Interval holds the information of an interval, where the GetMin 
+   //     vector<TMVA::Interval*> ranges : Interval holds the information of an interval, where the GetMin 
    //                          gets the low and GetMax gets the high constraint of the variable
    //                          the size of "ranges" is the number of coefficients which are optimised
    // Purpose: 

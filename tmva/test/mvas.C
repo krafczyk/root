@@ -24,6 +24,9 @@ void mvas( TString fin = "TMVA.root", HistType htype = MVAType, Bool_t useTMVASt
    TFile* file = TMVAGlob::OpenFile( fin );  
 
    // define Canvas layout here!
+   Int_t xPad = 1; // no of plots in x
+   Int_t yPad = 1; // no of plots in y
+   Int_t noPad = xPad * yPad ; 
    const Int_t width = 600;   // size of canvas
 
    // this defines how many canvases we need
@@ -55,7 +58,7 @@ void mvas( TString fin = "TMVA.root", HistType htype = MVAType, Bool_t useTMVASt
          TString methodTitle;
          TMVAGlob::GetMethodTitle(methodTitle,titDir);
 
-	 std::cout << "--- Found directory for method: " << methodName << "::" << methodTitle << std::flush;
+         cout << "--- Found directory for method: " << methodName << "::" << methodTitle << flush;
          TString hname = "MVA_" + methodTitle;
          if      (htype == ProbaType  ) hname += "_Proba";
          else if (htype == RarityType ) hname += "_Rarity";
@@ -193,7 +196,7 @@ void mvas( TString fin = "TMVA.root", HistType htype = MVAType, Bool_t useTMVASt
             bgdOv->SetLineColor( col );
             bgdOv->Draw("e1same");
 
-            ymax = TMath::Max( ymax, float(TMath::Max( sigOv->GetMaximum(), bgdOv->GetMaximum() )*maxMult ));
+            ymax = TMath::Max( ymax, TMath::Max( sigOv->GetMaximum(), bgdOv->GetMaximum() )*maxMult );
             frame->GetYaxis()->SetLimits( 0, ymax );
       
             // for better visibility, plot thinner lines
@@ -202,8 +205,8 @@ void mvas( TString fin = "TMVA.root", HistType htype = MVAType, Bool_t useTMVASt
 
             // perform K-S test
             cout << "--- Perform Kolmogorov-Smirnov tests" << endl;
-            Double_t kolS = sig->KolmogorovTest( sigOv, "X" );
-            Double_t kolB = bgd->KolmogorovTest( bgdOv, "X" );
+            Double_t kolS = sig->KolmogorovTest( sigOv );
+            Double_t kolB = bgd->KolmogorovTest( bgdOv );
             cout << "--- Goodness of signal (background) consistency: " << kolS << " (" << kolB << ")" << endl;
 
             TString probatext = Form( "Kolmogorov-Smirnov test: signal (background) probability = %5.3g (%5.3g)", kolS, kolB );

@@ -69,7 +69,7 @@ Bool_t TMVA::CCTreeWrapper::CCTreeNode::ReadDataRecord( std::istream& in, UInt_t
 }
 
 //_______________________________________________________________________
-void TMVA::CCTreeWrapper::CCTreeNode::Print( std::ostream& os ) const {
+void TMVA::CCTreeWrapper::CCTreeNode::Print( ostream& os ) const {
    // printout of the node (can be read in with ReadDataRecord)
 
    os << "----------------------" << std::endl 
@@ -81,7 +81,7 @@ void TMVA::CCTreeWrapper::CCTreeNode::Print( std::ostream& os ) const {
 }
 
 //_______________________________________________________________________
-void TMVA::CCTreeWrapper::CCTreeNode::PrintRec( std::ostream& os ) const {
+void TMVA::CCTreeWrapper::CCTreeNode::PrintRec( ostream& os ) const {
    // recursive printout of the node and its daughters 
 
    this->Print(os);
@@ -113,7 +113,7 @@ TMVA::CCTreeWrapper::~CCTreeWrapper( ) {
 //_______________________________________________________________________
 void TMVA::CCTreeWrapper::InitTree( CCTreeNode* t )
 {
-   // initialize the node t and all its descendants
+    // initialize the node t and all its descendants
    Double_t s = t->GetDTNode()->GetNSigEvents();
    Double_t b = t->GetDTNode()->GetNBkgEvents();
    //   Double_t s = t->GetDTNode()->GetNSigEvents_unweighted();
@@ -198,7 +198,7 @@ Double_t TMVA::CCTreeWrapper::TestTreeQuality( const DataSet* validationSample )
    // test the tree quality.. in terms of Miscalssification
    Double_t ncorrect=0, nfalse=0;
    for (Long64_t ievt=0; ievt<validationSample->GetNEvents(); ievt++){
-      const Event *ev = validationSample->GetEvent(ievt);
+      Event *ev = validationSample->GetEvent(ievt);
 
       Bool_t isSignalType = (CheckEvent(*ev) > fDTParent->GetNodePurityLimit() ) ? 1 : 0;
       

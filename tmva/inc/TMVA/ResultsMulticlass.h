@@ -66,7 +66,7 @@ namespace TMVA {
 
    public:
 
-      ResultsMulticlass( const DataSetInfo* dsi, TString resultsName  );
+      ResultsMulticlass( const DataSetInfo* dsi );
       ~ResultsMulticlass();
 
       // setters

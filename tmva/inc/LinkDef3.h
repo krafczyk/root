@@ -15,7 +15,6 @@
 #pragma link C++ class TMVA::Config::IONames+;
 #pragma link C++ class TMVA::KDEKernel+;
 #pragma link C++ class TMVA::Interval+;
-#pragma link C++ class TMVA::LogInterval+;
 #pragma link C++ class TMVA::FitterBase+;
 #pragma link C++ class TMVA::MCFitter+;
 #pragma link C++ class TMVA::GeneticFitter+;

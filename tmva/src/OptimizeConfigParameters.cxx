@@ -42,7 +42,7 @@
 ClassImp(TMVA::OptimizeConfigParameters)
    
 //_______________________________________________________________________
-TMVA::OptimizeConfigParameters::OptimizeConfigParameters(MethodBase * const method, std::map<TString,TMVA::Interval*> tuneParameters, TString fomType, TString optimizationFitType) 
+TMVA::OptimizeConfigParameters::OptimizeConfigParameters(MethodBase * const method, std::map<TString,TMVA::Interval> tuneParameters, TString fomType, TString optimizationFitType) 
 :  fMethod(method),
    fTuneParameters(tuneParameters),
    fFOMType(fomType),
@@ -50,13 +50,12 @@ TMVA::OptimizeConfigParameters::OptimizeConfigParameters(MethodBase * const meth
    fMvaSig(NULL),
    fMvaBkg(NULL),
    fMvaSigFineBin(NULL),
-   fMvaBkgFineBin(NULL),
-   fNotDoneYet(kFALSE)
+   fMvaBkgFineBin(NULL)
 {
    // Constructor which sets either "Classification or Regression"
-   std::string name = "OptimizeConfigParameters_";
-   name += std::string(GetMethod()->GetName());
-   fLogger = new MsgLogger(name);
+  std::string name = "OptimizeConfigParameters_";
+  name += std::string(GetMethod()->GetName());
+  fLogger = new MsgLogger(name);
    if (fMethod->DoRegression()){
       Log() << kFATAL << " ERROR: Sorry, Regression is not yet implement for automatic parameter optimization"
             << " --> exit" << Endl;
@@ -65,12 +64,12 @@ TMVA::OptimizeConfigParameters::OptimizeConfigParameters(MethodBase * const meth
    Log() << kINFO << "Automatic optimisation of tuning parameters in " 
          << GetMethod()->GetName() << " uses:" << Endl;
 
-   std::map<TString,TMVA::Interval*>::iterator it;
+   std::map<TString,TMVA::Interval>::iterator it;
    for (it=fTuneParameters.begin(); it!=fTuneParameters.end();it++) {
       Log() << kINFO << it->first 
-            << " in range from: " << it->second->GetMin()
-            << " to: " << it->second->GetMax()
-            << " in : " << it->second->GetNbins()  << " steps"
+            << " in range from: " << it->second.GetMin()
+            << " to: " << it->second.GetMax()
+            << " in : " << it->second.GetNbins()  << " steps"
             << Endl;
    }
    Log() << kINFO << " using the options: " << fFOMType << " and " << fOptimizationFitType << Endl;
@@ -106,8 +105,6 @@ TMVA::OptimizeConfigParameters::~OptimizeConfigParameters()
    gFOMvsIter->Write();
    h->Write();
 
-   delete [] x;
-   delete [] y;
    // delete fFOMvsIter;
 } 
 //_______________________________________________________________________
@@ -117,13 +114,13 @@ std::map<TString,Double_t> TMVA::OptimizeConfigParameters::optimize()
    else if (fOptimizationFitType == "FitGA" || fOptimizationFitType == "Minuit" ) this->optimizeFit();
    else {
       Log() << kFATAL << "You have chosen as optimization type " << fOptimizationFitType
-            << " that is not (yet) coded --> exit()" << Endl;
+                << " that is not (yet) coded --> exit()" << Endl;
    }
    
    Log() << kINFO << "For " << GetMethod()->GetName() << " the optimized Parameters are: " << Endl;
    std::map<TString,Double_t>::iterator it;
    for(it=fTunedParameters.begin(); it!= fTunedParameters.end(); it++){
-      Log() << kINFO << it->first << " = " << it->second << Endl;
+     Log() << kINFO << it->first << " = " << it->second << Endl;
    }
    return fTunedParameters;
 
@@ -153,7 +150,7 @@ void TMVA::OptimizeConfigParameters::optimizeScan()
    Double_t      bestFOM=-1000000, currentFOM;
 
    std::map<TString,Double_t> currentParameters;
-   std::map<TString,TMVA::Interval*>::iterator it;
+   std::map<TString,TMVA::Interval>::iterator it;
 
    // for the scan, start at the lower end of the interval and then "move upwards" 
    // initialize all parameters in currentParameter
@@ -161,8 +158,8 @@ void TMVA::OptimizeConfigParameters::optimizeScan()
    fTunedParameters.clear();
 
    for (it=fTuneParameters.begin(); it!=fTuneParameters.end(); it++){
-      currentParameters.insert(std::pair<TString,Double_t>(it->first,it->second->GetMin()));
-      fTunedParameters.insert(std::pair<TString,Double_t>(it->first,it->second->GetMin()));
+      currentParameters.insert(std::pair<TString,Double_t>(it->first,it->second.GetMin()));
+      fTunedParameters.insert(std::pair<TString,Double_t>(it->first,it->second.GetMin()));
    }
    // now loop over all the parameters and get for each combination the figure of merit
 
@@ -172,8 +169,8 @@ void TMVA::OptimizeConfigParameters::optimizeScan()
    std::vector< std::vector <Double_t> > v;
    for (it=fTuneParameters.begin(); it!=fTuneParameters.end(); it++){
       std::vector< Double_t > tmp;
-      for (Int_t k=0; k<it->second->GetNbins(); k++){
-         tmp.push_back(it->second->GetElement(k));
+      for (Int_t k=0; k<it->second.GetNbins(); k++){
+         tmp.push_back(it->second.GetElement(k));
       }
       v.push_back(tmp);
    }
@@ -182,11 +179,11 @@ void TMVA::OptimizeConfigParameters::optimizeScan()
    for (UInt_t i=0; i<v.size(); i++) {
       Ntot *= v[i].size();
       Nindividual.push_back(v[i].size());
-   }
+    }
    //loop on the total number of differnt combinations
    
    for (int i=0; i<Ntot; i++){
-      UInt_t index=0;
+       UInt_t index=0;
       std::vector<int> indices = GetScanIndices(i, Nindividual );
       for (it=fTuneParameters.begin(), index=0; index< indices.size(); index++, it++){
          currentParameters[it->first] = v[index][indices[index]];
@@ -196,17 +193,15 @@ void TMVA::OptimizeConfigParameters::optimizeScan()
       for (std::map<TString,Double_t>::iterator it_print=currentParameters.begin(); 
            it_print!=currentParameters.end(); it_print++){
          Log() << kINFO << "  " << it_print->first  << " = " << it_print->second << Endl;
-      }
+       }
 
       GetMethod()->Reset();
       GetMethod()->SetTuneParameters(currentParameters);
       // now do the training for the current parameters:
       GetMethod()->BaseDir()->cd();
-      if (i==0) GetMethod()->GetTransformationHandler().CalcTransformations(
-                                                                            GetMethod()->Data()->GetEventCollection());
-      Event::SetIsTraining(kTRUE);
+      GetMethod()->GetTransformationHandler().CalcTransformations(
+                                                                  GetMethod()->Data()->GetEventCollection());
       GetMethod()->Train();
-      Event::SetIsTraining(kFALSE);
       currentFOM = GetFOM(); 
       Log() << kINFO << "FOM was found : " << currentFOM << "; current best is " << bestFOM << Endl;
       
@@ -227,14 +222,14 @@ void TMVA::OptimizeConfigParameters::optimizeFit()
 {
    // ranges (intervals) in which the fit varies the parameters
    std::vector<TMVA::Interval*> ranges; // intervals of the fit ranges
-   std::map<TString, TMVA::Interval*>::iterator it;
+   std::map<TString, TMVA::Interval>::iterator it;
    std::vector<Double_t> pars;    // current (starting) fit parameters
 
    for (it=fTuneParameters.begin(); it != fTuneParameters.end(); it++){
-      ranges.push_back(new TMVA::Interval(*(it->second))); 
-      pars.push_back( (it->second)->GetMean() );  // like this the order is "right". Always keep the
-      // order in the vector "pars" the same as the iterator
-      // iterates through the tuneParameters !!!!
+      ranges.push_back(new TMVA::Interval(it->second)); 
+      pars.push_back( (it->second).GetMean() );  // like this the order is "right". Always keep the
+                                                 // order in the vector "pars" the same as the iterator
+                                                 // iterates through the tuneParameters !!!!
    }
 
    // create the fitter
@@ -242,15 +237,15 @@ void TMVA::OptimizeConfigParameters::optimizeFit()
    FitterBase* fitter = NULL;
 
    if ( fOptimizationFitType == "Minuit"  ) {
-      TString opt="";
-      fitter = new MinuitFitter(  *this, 
-                                  "FitterMinuit_BDTOptimize", 
-                                  ranges, opt );
+     TString opt="";
+     fitter = new MinuitFitter(  *this, 
+                                 "FitterMinuit_BDTOptimize", 
+                                 ranges, opt );
    }else if ( fOptimizationFitType == "FitGA"  ) {
-      TString opt="PopSize=20:Steps=30:Cycles=3:ConvCrit=0.01:SaveBestCycle=5";
-      fitter = new GeneticFitter( *this, 
-                                  "FitterGA_BDTOptimize", 
-                                  ranges, opt );
+     TString opt="PopSize=20:Steps=30:Cycles=3:ConvCrit=0.01:SaveBestCycle=5";
+     fitter = new GeneticFitter( *this, 
+                                 "FitterGA_BDTOptimize", 
+                                 ranges, opt );
    } else {
       Log() << kWARNING << " you did not specify a valid OptimizationFitType " 
             << " will use the default (FitGA) " << Endl;
@@ -298,7 +293,7 @@ Double_t TMVA::OptimizeConfigParameters::EstimatorFunction( std::vector<Double_t
       std::map<TString,Double_t> currentParameters;
       Int_t icount =0; // map "pars" to the  map of Tuneparameter, make sure
                        // you never screw up this order!!
-      std::map<TString, TMVA::Interval*>::iterator it;
+      std::map<TString, TMVA::Interval>::iterator it;
       for (it=fTuneParameters.begin(); it!=fTuneParameters.end(); it++){
          currentParameters[it->first] = pars[icount++];
       }
@@ -306,15 +301,10 @@ Double_t TMVA::OptimizeConfigParameters::EstimatorFunction( std::vector<Double_t
       GetMethod()->SetTuneParameters(currentParameters);
       GetMethod()->BaseDir()->cd();
       
-      if (fNotDoneYet){
-         GetMethod()->GetTransformationHandler().
-            CalcTransformations(GetMethod()->Data()->GetEventCollection());
-         fNotDoneYet=kFALSE;
-      }
-      Event::SetIsTraining(kTRUE);
+      GetMethod()->GetTransformationHandler().CalcTransformations(
+                                                                  GetMethod()->Data()->GetEventCollection());
+      
       GetMethod()->Train();
-      Event::SetIsTraining(kFALSE);
-
       
       Double_t currentFOM = GetFOM(); 
       
@@ -326,8 +316,8 @@ Double_t TMVA::OptimizeConfigParameters::EstimatorFunction( std::vector<Double_t
 //_______________________________________________________________________
 Double_t TMVA::OptimizeConfigParameters::GetFOM()
 {
-   // Return the Figure of Merit (FOM) used in the parameter 
-   //  optimization process
+  // Return the Figure of Merit (FOM) used in the parameter 
+  //  optimization process
   
    Double_t fom=0;
    if (fMethod->DoRegression()){
@@ -339,7 +329,6 @@ Double_t TMVA::OptimizeConfigParameters::GetFOM()
       else if (fFOMType == "ROCIntegral") fom = GetROCIntegral();
       else if (fFOMType == "SigEffAtBkgEff01")  fom = GetSigEffAtBkgEff(0.1);
       else if (fFOMType == "SigEffAtBkgEff001") fom = GetSigEffAtBkgEff(0.01);
-      else if (fFOMType == "SigEffAtBkgEff002") fom = GetSigEffAtBkgEff(0.02);
       else if (fFOMType == "BkgRejAtSigEff05")  fom = GetBkgRejAtSigEff(0.5);
       else if (fFOMType == "BkgEffAtSigEff05")  fom = GetBkgEffAtSigEff(0.5);
       else {
@@ -349,7 +338,6 @@ Double_t TMVA::OptimizeConfigParameters::GetFOM()
       }
    }
    fFOMvsIter.push_back(fom);
-   //   std::cout << "fom="<<fom<<std::endl; // should write that into a debug log (as option)
    return fom;
 }
 
@@ -374,7 +362,7 @@ void TMVA::OptimizeConfigParameters::GetMVADists()
    fMvaSigFineBin = new TH1D("fMvaSigFineBin","",100000,-1.5,1.5);
    fMvaBkgFineBin = new TH1D("fMvaBkgFineBin","",100000,-1.5,1.5);
 
-   const std::vector< Event*> events=fMethod->Data()->GetEventCollection(Types::kTesting);
+   const std::vector<Event*> events=fMethod->Data()->GetEventCollection(Types::kTesting);
    
    UInt_t signalClassNr = fMethod->DataInfo().GetClassInfo("Signal")->GetNumber();
 
@@ -397,7 +385,7 @@ void TMVA::OptimizeConfigParameters::GetMVADists()
 Double_t TMVA::OptimizeConfigParameters::GetSeparation()
 {
    // return the searation between the signal and background 
-   // MVA ouput distribution
+   // MVA output distribution
    GetMVADists();
    if (1){
       PDF *splS = new PDF( " PDF Sig", fMvaSig, PDF::kSpline2 );
@@ -416,10 +404,10 @@ Double_t TMVA::OptimizeConfigParameters::GetROCIntegral()
    // calculate the area (integral) under the ROC curve as a
    // overall quality measure of the classification
    //
-   // makeing pdfs out of the MVA-ouput distributions doesn't work
-   // reliably for cases where the MVA-ouput isn't a smooth distribution.
+   // makeing pdfs out of the MVA-output distributions doesn't work
+   // reliably for cases where the MVA-output isn't a smooth distribution.
    // this happens "frequently" in BDTs for example when the number of
-   // trees is small resulting in only some discrete possible MVA ouput values.
+   // trees is small resulting in only some discrete possible MVA output values.
    // (I still leave the code here, but use this with care!!! The default
    // however is to use the distributions!!!
 

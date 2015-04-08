@@ -37,15 +37,15 @@ DICTH1       := Configurable.h Event.h Factory.h MethodBase.h MethodCompositeBas
 		MethodANNBase.h MethodTMlpANN.h MethodRuleFit.h MethodCuts.h MethodFisher.h \
 		MethodKNN.h MethodCFMlpANN.h MethodCFMlpANN_Utils.h MethodLikelihood.h \
 		MethodHMatrix.h MethodPDERS.h MethodBDT.h MethodDT.h MethodSVM.h MethodBayesClassifier.h \
-		MethodFDA.h MethodMLP.h MethodBoost.h \
+		MethodFDA.h MethodMLP.h MethodCommittee.h MethodBoost.h \
 		MethodPDEFoam.h MethodLD.h MethodCategory.h
 DICTH2       := TSpline2.h TSpline1.h PDF.h BinaryTree.h BinarySearchTreeNode.h BinarySearchTree.h \
 		Timer.h RootFinder.h CrossEntropy.h DecisionTree.h DecisionTreeNode.h MisClassificationError.h \
 		Node.h SdivSqrtSplusB.h SeparationBase.h RegressionVariance.h Tools.h Reader.h \
 		GeneticAlgorithm.h GeneticGenes.h GeneticPopulation.h GeneticRange.h GiniIndex.h \
-		GiniIndexWithLaplace.h SimulatedAnnealing.h QuickMVAProbEstimator.h
-DICTH3       := Config.h KDEKernel.h Interval.h LogInterval.h FitterBase.h MCFitter.h GeneticFitter.h  \
-		SimulatedAnnealingFitter.h MinuitFitter.h MinuitWrapper.h IFitterTarget.h \
+		GiniIndexWithLaplace.h SimulatedAnnealing.h
+DICTH3       := Config.h KDEKernel.h Interval.h FitterBase.h MCFitter.h GeneticFitter.h SimulatedAnnealingFitter.h \
+		MinuitFitter.h MinuitWrapper.h IFitterTarget.h \
 		PDEFoam.h PDEFoamDecisionTree.h PDEFoamDensityBase.h PDEFoamDiscriminantDensity.h \
 		PDEFoamEventDensity.h PDEFoamTargetDensity.h PDEFoamDecisionTreeDensity.h PDEFoamMultiTarget.h \
 		PDEFoamVect.h PDEFoamCell.h PDEFoamDiscriminant.h PDEFoamEvent.h PDEFoamTarget.h \
@@ -56,12 +56,13 @@ DICTH4       := TNeuron.h TSynapse.h TActivationChooser.h TActivation.h TActivat
 		TActivationTanh.h TActivationRadial.h TNeuronInputChooser.h TNeuronInput.h TNeuronInputSum.h \
 		TNeuronInputSqSum.h TNeuronInputAbs.h Types.h Ranking.h RuleFit.h RuleFitAPI.h IMethod.h MsgLogger.h \
 		VariableTransformBase.h VariableIdentityTransform.h VariableDecorrTransform.h VariablePCATransform.h \
-		VariableGaussTransform.h VariableNormalizeTransform.h VariableRearrangeTransform.h ROCCalc.h  
+		VariableGaussTransform.h VariableNormalizeTransform.h VariableRearrangeTransform.h
 DICTH1       := $(patsubst %,inc/TMVA/%,$(DICTH1))
 DICTH2       := $(patsubst %,inc/TMVA/%,$(DICTH2))
 DICTH3       := $(patsubst %,inc/TMVA/%,$(DICTH3))
 DICTH4       := $(patsubst %,inc/TMVA/%,$(DICTH4))
 DICTH        := $(DICTH1) $(DICTH2) $(DICTH3) $(DICTH4)
+
 
 SKIPCPPLIST  := 
 SKIPHLIST    := $(DICTHEAD) $(DICTL)

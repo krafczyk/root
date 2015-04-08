@@ -61,28 +61,26 @@
 #include "TMVA/MCFitter.h"
 #include "TMVA/Config.h"
 
-using std::stringstream;
-
 REGISTER_METHOD(FDA)
 
 ClassImp(TMVA::MethodFDA)
 
 //_______________________________________________________________________
-   TMVA::MethodFDA::MethodFDA( const TString& jobName,
-                               const TString& methodTitle,
-                               DataSetInfo& theData,
-                               const TString& theOption,
-                               TDirectory* theTargetDir )
+TMVA::MethodFDA::MethodFDA( const TString& jobName,
+                            const TString& methodTitle,
+                            DataSetInfo& theData,
+                            const TString& theOption,
+                            TDirectory* theTargetDir )
    : MethodBase( jobName, Types::kFDA, methodTitle, theData, theOption, theTargetDir ),
-   IFitterTarget   (),
-   fFormula        ( 0 ),
-   fNPars          ( 0 ),
-   fFitter         ( 0 ),
-   fConvergerFitter( 0 ),
-   fSumOfWeightsSig( 0 ),
-   fSumOfWeightsBkg( 0 ),
-   fSumOfWeights   ( 0 ),
-   fOutputDimensions( 0 )
+     IFitterTarget   (),
+     fFormula        ( 0 ),
+     fNPars          ( 0 ),
+     fFitter         ( 0 ),
+     fConvergerFitter( 0 ),
+     fSumOfWeightsSig( 0 ),
+     fSumOfWeightsBkg( 0 ),
+     fSumOfWeights   ( 0 ),
+     fOutputDimensions( 0 )
 {
    // standard constructor
 }
@@ -178,11 +176,11 @@ void TMVA::MethodFDA::CreateFormula()
    for (Int_t ipar=fNPars; ipar<1000; ipar++) {
       if (fFormulaStringT.Contains( Form("(%i)",ipar) ))
          Log() << kFATAL
-               << "<CreateFormula> Formula contains expression: \"" << Form("(%i)",ipar) << "\", "
+                 << "<CreateFormula> Formula contains expression: \"" << Form("(%i)",ipar) << "\", "
                << "which cannot be attributed to a parameter; "
-               << "it may be that the number of variable ranges given via \"ParRanges\" "
-               << "does not match the number of parameters in the formula expression, please verify!"
-               << Endl;
+                 << "it may be that the number of variable ranges given via \"ParRanges\" "
+                 << "does not match the number of parameters in the formula expression, please verify!"
+                 << Endl;
    }
 
    // write the variables "xi" as additional parameters "[npar+i]"
@@ -194,8 +192,8 @@ void TMVA::MethodFDA::CreateFormula()
    for (UInt_t ivar=GetNvar(); ivar<1000; ivar++) {
       if (fFormulaStringT.Contains( Form("x%i",ivar) ))
          Log() << kFATAL
-               << "<CreateFormula> Formula contains expression: \"" << Form("x%i",ivar) << "\", "
-               << "which cannot be attributed to an input variable" << Endl;
+                 << "<CreateFormula> Formula contains expression: \"" << Form("x%i",ivar) << "\", "
+                 << "which cannot be attributed to an input variable" << Endl;
    }
 
    Log() << "User-defined formula string       : \"" << fFormulaStringP << "\"" << Endl;
@@ -217,7 +215,7 @@ void TMVA::MethodFDA::CreateFormula()
    // other sanity checks
    if (fFormula->GetNpar() > (Int_t)(fNPars + GetNvar()))
       Log() << kFATAL << "<ProcessOptions> Dubious number of parameters in formula expression: "
-            << fFormula->GetNpar() << " - compared to maximum allowed: " << fNPars + GetNvar() << Endl;
+              << fFormula->GetNpar() << " - compared to maximum allowed: " << fNPars + GetNvar() << Endl;
 }
 
 //_______________________________________________________________________
@@ -253,13 +251,13 @@ void TMVA::MethodFDA::ProcessOptions()
       TString pminS(str(1,istr-1));
       TString pmaxS(str(istr+1,str.Length()-2-istr));
 
-      stringstream stmin; Float_t pmin=0; stmin << pminS.Data(); stmin >> pmin;
-      stringstream stmax; Float_t pmax=0; stmax << pmaxS.Data(); stmax >> pmax;
+      stringstream stmin; Float_t pmin; stmin << pminS.Data(); stmin >> pmin;
+      stringstream stmax; Float_t pmax; stmax << pmaxS.Data(); stmax >> pmax;
 
       // sanity check
       if (TMath::Abs(pmax-pmin) < 1.e-30) pmax = pmin;
       if (pmin > pmax) Log() << kFATAL << "<ProcessOptions> max > min in interval for parameter: ["
-                             << ipar << "] : [" << pmin  << ", " << pmax << "] " << Endl;
+                               << ipar << "] : [" << pmin  << ", " << pmax << "] " << Endl;
 
       Log() << kINFO << "Create parameter interval for parameter " << ipar << " : [" << pmin << "," << pmax << "]" << Endl;
       fParRange[ipar] = new Interval( pmin, pmax );
@@ -329,9 +327,9 @@ void TMVA::MethodFDA::ClearAll( void )
 {
    // delete and clear all class members
    
-   // if there is more than one output dimension, the paramater ranges are the same again (object has been copied).
+   // if there is more than one output dimension, the parameter ranges are the same again (object has been copied).
    // hence, ... erase the copied pointers to assure, that they are deleted only once.
-   //   fParRange.erase( fParRange.begin()+(fNPars), fParRange.end() );
+//   fParRange.erase( fParRange.begin()+(fNPars), fParRange.end() );
    for (UInt_t ipar=0; ipar<fParRange.size() && ipar<fNPars; ipar++) {
       if (fParRange[ipar] != 0) { delete fParRange[ipar]; fParRange[ipar] = 0; }
    }
@@ -357,7 +355,7 @@ void TMVA::MethodFDA::Train( void )
       const Event* ev = GetEvent(ievt);
 
       // true event copy
-      Float_t w  = ev->GetWeight();
+      Float_t w  = GetTWeight(ev);
 
       if (!DoRegression()) {
          if (DataInfo().IsSignal(ev)) { fSumOfWeightsSig += w; }
@@ -370,12 +368,12 @@ void TMVA::MethodFDA::Train( void )
    if (!DoRegression()) {
       if (fSumOfWeightsSig <= 0 || fSumOfWeightsBkg <= 0) {
          Log() << kFATAL << "<Train> Troubles in sum of weights: " 
-               << fSumOfWeightsSig << " (S) : " << fSumOfWeightsBkg << " (B)" << Endl;
+                 << fSumOfWeightsSig << " (S) : " << fSumOfWeightsBkg << " (B)" << Endl;
       }
    }
    else if (fSumOfWeights <= 0) {
       Log() << kFATAL << "<Train> Troubles in sum of weights: " 
-            << fSumOfWeights << Endl;
+              << fSumOfWeights << Endl;
    }
 
    // starting values (not used by all fitters)
@@ -404,7 +402,7 @@ void TMVA::MethodFDA::PrintResults( const TString& fitter, std::vector<Double_t>
    // check maximum length of variable name
    Log() << kINFO;
    Log() << "Results for parameter fit using \"" << fitter << "\" fitter:" << Endl;
-   std::vector<TString>  parNames;
+   vector<TString>  parNames;
    for (UInt_t ipar=0; ipar<pars.size(); ipar++) parNames.push_back( Form("Par(%i)",ipar ) );
    gTools().FormattedOutput( pars, parNames, "Parameter" , "Fit result", Log(), "%g" );   
    Log() << "Discriminator expression: \"" << fFormulaStringP << "\"" << Endl;
@@ -426,15 +424,15 @@ Double_t TMVA::MethodFDA::EstimatorFunction( std::vector<Double_t>& pars )
    // calculate the deviation from the desired value
    if( DoRegression() ){
       for (UInt_t ievt=0; ievt<GetNEvents(); ievt++) {
-         // read the training event 
-         const TMVA::Event* ev = GetEvent(ievt);
+	 // read the training event 
+	 const TMVA::Event* ev = GetEvent(ievt);
 
-         for( Int_t dim = 0; dim < fOutputDimensions; ++dim ){
-            desired = ev->GetTarget( dim );
-            result    = InterpretFormula( ev, pars.begin(), pars.end() );
-            deviation = TMath::Power(result - desired, 2);
-            estimator[2]  += deviation * ev->GetWeight();
-         }
+	 for( Int_t dim = 0; dim < fOutputDimensions; ++dim ){
+	    desired = ev->GetTarget( dim );
+	    result    = InterpretFormula( ev, pars.begin(), pars.end() );
+	    deviation = TMath::Power(result - desired, 2);
+	    estimator[2]  += deviation * ev->GetWeight();
+	 }
       }
       estimator[2] /= sumOfWeights[2];
       // return value is sum over normalised signal and background contributions
@@ -442,18 +440,18 @@ Double_t TMVA::MethodFDA::EstimatorFunction( std::vector<Double_t>& pars )
 
    }else if( DoMulticlass() ){
       for (UInt_t ievt=0; ievt<GetNEvents(); ievt++) {
-         // read the training event 
-         const TMVA::Event* ev = GetEvent(ievt);
+	 // read the training event 
+	 const TMVA::Event* ev = GetEvent(ievt);
 
-         CalculateMulticlassValues( ev, pars, *fMulticlassReturnVal );
+	 CalculateMulticlassValues( ev, pars, *fMulticlassReturnVal );
 
-         Double_t crossEntropy = 0.0;
-         for( Int_t dim = 0; dim < fOutputDimensions; ++dim ){
-            Double_t y = fMulticlassReturnVal->at(dim);
-            Double_t t = (ev->GetClass() == static_cast<UInt_t>(dim) ? 1.0 : 0.0 );
-            crossEntropy += t*log(y);
-         }
-         estimator[2] += ev->GetWeight()*crossEntropy; 
+	 Double_t crossEntropy = 0.0;
+	 for( Int_t dim = 0; dim < fOutputDimensions; ++dim ){
+	    Double_t y = fMulticlassReturnVal->at(dim);
+	    Double_t t = (ev->GetClass() == static_cast<UInt_t>(dim) ? 1.0 : 0.0 );
+	    crossEntropy += t*log(y);
+	 }
+	 estimator[2] += ev->GetWeight()*crossEntropy; 
       }
       estimator[2] /= sumOfWeights[2];
       // return value is sum over normalised signal and background contributions
@@ -461,13 +459,13 @@ Double_t TMVA::MethodFDA::EstimatorFunction( std::vector<Double_t>& pars )
 
    }else{
       for (UInt_t ievt=0; ievt<GetNEvents(); ievt++) {
-         // read the training event 
-         const TMVA::Event* ev = GetEvent(ievt);
+	 // read the training event 
+	 const TMVA::Event* ev = GetEvent(ievt);
 
-         desired = (DataInfo().IsSignal(ev) ? 1.0 : 0.0);
-         result    = InterpretFormula( ev, pars.begin(), pars.end() );
-         deviation = TMath::Power(result - desired, 2);
-         estimator[Int_t(desired)] += deviation * ev->GetWeight();
+	 desired = (DataInfo().IsSignal(ev) ? 1.0 : 0.0);
+	 result    = InterpretFormula( ev, pars.begin(), pars.end() );
+	 deviation = TMath::Power(result - desired, 2);
+	 estimator[Int_t(desired)] += deviation * ev->GetWeight();
       }
       estimator[0] /= sumOfWeights[0];
       estimator[1] /= sumOfWeights[1];
@@ -481,16 +479,16 @@ Double_t TMVA::MethodFDA::InterpretFormula( const Event* event, std::vector<Doub
 {
    // formula interpretation
    Int_t ipar = 0;
-   //    std::cout << "pars ";
+//    std::cout << "pars ";
    for( std::vector<Double_t>::iterator it = parBegin; it != parEnd; ++it ){
-      //       std::cout << " i" << ipar << " val" << (*it);
+//       std::cout << " i" << ipar << " val" << (*it);
       fFormula->SetParameter( ipar, (*it) );
       ++ipar;
    }
    for (UInt_t ivar=0;  ivar<GetNvar();  ivar++) fFormula->SetParameter( ivar+ipar, event->GetValue(ivar) );
 
    Double_t result = fFormula->Eval( 0 );
-   //    std::cout << "  result " << result << std::endl;
+//    std::cout << "  result " << result << std::endl;
    return result;
 }
 
@@ -561,29 +559,29 @@ void TMVA::MethodFDA::CalculateMulticlassValues( const TMVA::Event*& evt, std::v
    // calculate the values for multiclass
    values.clear();
 
-   //    std::copy( parameters.begin(), parameters.end(), std::ostream_iterator<double>( std::cout, " " ) );
-   //    std::cout << std::endl;
+//    std::copy( parameters.begin(), parameters.end(), std::ostream_iterator<double>( std::cout, " " ) );
+//    std::cout << std::endl;
 
-   //    char inp;
-   //    std::cin >> inp;
+//    char inp;
+//    std::cin >> inp;
 
    Double_t sum=0;
    for( Int_t dim = 0; dim < fOutputDimensions; ++dim ){ // check for all other dimensions (=classes)
       Int_t offset = dim*fNPars;
       Double_t value = InterpretFormula( evt, parameters.begin()+offset, parameters.begin()+offset+fNPars );
-      //       std::cout << "dim : " << dim << " value " << value << "    offset " << offset << std::endl;
+//       std::cout << "dim : " << dim << " value " << value << "    offset " << offset << std::endl;
       values.push_back( value );
       sum += value;
    }
 
-   //    // normalize to sum of value (commented out, .. have to think of how to treat negative classifier values)
-   //    std::transform( fMulticlassReturnVal.begin(), fMulticlassReturnVal.end(), fMulticlassReturnVal.begin(), bind2nd( std::divides<float>(), sum) );
+//    // normalize to sum of value (commented out, .. have to think of how to treat negative classifier values)
+//    std::transform( fMulticlassReturnVal.begin(), fMulticlassReturnVal.end(), fMulticlassReturnVal.begin(), bind2nd( std::divides<float>(), sum) );
 }
 
 
 
 //_______________________________________________________________________
-void  TMVA::MethodFDA::ReadWeightsFromStream( std::istream& istr )
+void  TMVA::MethodFDA::ReadWeightsFromStream( istream& istr )
 {
    // read back the training results from a file (stream)
 
@@ -640,7 +638,7 @@ void TMVA::MethodFDA::ReadWeightsFromXML( void* wghtnode )
 
       // sanity check
       if (ipar >= fNPars*fOutputDimensions) Log() << kFATAL << "<ReadWeightsFromXML> index out of range: "
-                                                  << ipar << " >= " << fNPars << Endl;
+                                  << ipar << " >= " << fNPars << Endl;
       fBestPars[ipar] = par;
 
       ch = gTools().GetNextChild(ch);
@@ -657,19 +655,19 @@ void TMVA::MethodFDA::ReadWeightsFromXML( void* wghtnode )
 void TMVA::MethodFDA::MakeClassSpecific( std::ostream& fout, const TString& className ) const
 {
    // write FDA-specific classifier response
-   fout << "   double              fParameter[" << fNPars << "];" << std::endl;
-   fout << "};" << std::endl;
-   fout << "" << std::endl;
-   fout << "inline void " << className << "::Initialize() " << std::endl;
-   fout << "{" << std::endl;
+   fout << "   double              fParameter[" << fNPars << "];" << endl;
+   fout << "};" << endl;
+   fout << "" << endl;
+   fout << "inline void " << className << "::Initialize() " << endl;
+   fout << "{" << endl;
    for(UInt_t ipar=0; ipar<fNPars; ipar++) {
-      fout << "   fParameter[" << ipar << "] = " << fBestPars[ipar] << ";" << std::endl;
+      fout << "   fParameter[" << ipar << "] = " << fBestPars[ipar] << ";" << endl;
    }
-   fout << "}" << std::endl;
-   fout << std::endl;
-   fout << "inline double " << className << "::GetMvaValue__( const std::vector<double>& inputValues ) const" << std::endl;
-   fout << "{" << std::endl;
-   fout << "   // interpret the formula" << std::endl;
+   fout << "}" << endl;
+   fout << endl;
+   fout << "inline double " << className << "::GetMvaValue__( const std::vector<double>& inputValues ) const" << endl;
+   fout << "{" << endl;
+   fout << "   // interpret the formula" << endl;
 
    // replace parameters
    TString str = fFormulaStringT;
@@ -682,16 +680,16 @@ void TMVA::MethodFDA::MakeClassSpecific( std::ostream& fout, const TString& clas
       str.ReplaceAll( Form("[%i]", ivar+fNPars), Form("inputValues[%i]", ivar) );
    }
 
-   fout << "   double retval = " << str << ";" << std::endl;
-   fout << std::endl;
-   fout << "   return retval; " << std::endl;
-   fout << "}" << std::endl;
-   fout << std::endl;
-   fout << "// Clean up" << std::endl;
-   fout << "inline void " << className << "::Clear() " << std::endl;
-   fout << "{" << std::endl;
-   fout << "   // nothing to clear" << std::endl;
-   fout << "}" << std::endl;
+   fout << "   double retval = " << str << ";" << endl;
+   fout << endl;
+   fout << "   return retval; " << endl;
+   fout << "}" << endl;
+   fout << endl;
+   fout << "// Clean up" << endl;
+   fout << "inline void " << className << "::Clear() " << endl;
+   fout << "{" << endl;
+   fout << "   // nothing to clear" << endl;
+   fout << "}" << endl;
 }
 
 //_______________________________________________________________________

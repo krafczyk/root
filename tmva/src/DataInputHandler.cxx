@@ -60,7 +60,7 @@ void TMVA::DataInputHandler::AddTree( const TString& fn,
                                       const TCut& cut, 
                                       Types::ETreeType tt  ) 
 {
-   // add a *className* tree to the dataset to be used as input
+   // add a signal tree to the dataset to be used as input
    TTree * tr = ReadInputTree(fn);
    tr->SetName( TString("Tree")+className );
    AddTree( tr, className, weight, cut, tt );
@@ -73,8 +73,6 @@ void TMVA::DataInputHandler::AddTree( TTree* tree,
                                       const TCut& cut, 
                                       Types::ETreeType tt ) 
 {
-   // add  tree of *className* events  for tt (Training;Testing..) type as input .. 
-
    if (!tree) Log() << kFATAL << "Zero pointer for tree of class " << className.Data() << Endl;
    if (tree->GetEntries()==0) Log() << kFATAL << "Encountered empty TTree or TChain of class " << className.Data() << Endl;
    if (fInputTrees[className.Data()].empty()) {
@@ -103,14 +101,12 @@ void TMVA::DataInputHandler::AddTree( TTree* tree,
 //_______________________________________________________________________
 void TMVA::DataInputHandler::AddSignalTree( TTree* tr, Double_t weight, Types::ETreeType tt ) 
 {
-   // add a signal tree to the dataset to be used as input
    AddTree( tr, "Signal", weight, "", tt );
 }
 
 //_______________________________________________________________________
 void TMVA::DataInputHandler::AddBackgroundTree( TTree* tr, Double_t weight, Types::ETreeType tt )
 {
-   // add a background tree to the dataset to be used as input
    AddTree( tr, "Background", weight, "", tt );
 }
 
@@ -137,8 +133,8 @@ TTree* TMVA::DataInputHandler::ReadInputTree( const TString& dataFile )
 {
    // create trees from these ascii files
    TTree* tr = new TTree( "tmp", dataFile );
-   std::ifstream in(dataFile);
-   tr->SetDirectory(0); Log() << kWARNING << "Watch out, I (Helge) made the Tree not associated to the current directory .. Hopefully that does not have unwanted consequences" << Endl; 
+  
+   ifstream in(dataFile);
    if (!in.good()) Log() << kFATAL << "Could not open file: " << dataFile << Endl;
    in.close();
 

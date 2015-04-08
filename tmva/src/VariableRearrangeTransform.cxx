@@ -60,7 +60,7 @@ void TMVA::VariableRearrangeTransform::Initialize()
 }
 
 //_______________________________________________________________________
-Bool_t TMVA::VariableRearrangeTransform::PrepareTransformation (const std::vector<Event*>& /*events*/)
+Bool_t TMVA::VariableRearrangeTransform::PrepareTransformation( const std::vector<Event*>& /*events*/ )
 {
    // prepare transformation --> (nothing to do)
    if (!IsEnabled() || IsCreated()) return kTRUE;
@@ -124,7 +124,7 @@ std::vector<TString>* TMVA::VariableRearrangeTransform::GetTransformationStrings
 //_______________________________________________________________________
 void TMVA::VariableRearrangeTransform::AttachXMLTo(void* parent) 
 {
-   //    // create XML description of Rearrange transformation
+//    // create XML description of Rearrange transformation
    void* trfxml = gTools().AddChild(parent, "Transform");
    gTools().AddAttr(trfxml, "Name", "Rearrange");
 
@@ -134,7 +134,7 @@ void TMVA::VariableRearrangeTransform::AttachXMLTo(void* parent)
 //_______________________________________________________________________
 void TMVA::VariableRearrangeTransform::ReadFromXML( void* trfnode ) 
 {
-   //    // Read the transformation matrices from the xml node
+//    // Read the transformation matrices from the xml node
 
 
    void* inpnode = NULL;
@@ -149,7 +149,7 @@ void TMVA::VariableRearrangeTransform::ReadFromXML( void* trfnode )
 }
 
 //_______________________________________________________________________
-void TMVA::VariableRearrangeTransform::PrintTransformation( std::ostream& ) 
+void TMVA::VariableRearrangeTransform::PrintTransformation( ostream& ) 
 {
    // prints the transformation ranges
 }

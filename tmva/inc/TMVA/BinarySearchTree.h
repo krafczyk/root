@@ -65,6 +65,7 @@ class TTree;
 
 namespace TMVA {
 
+   class DataSet;
    class Event;
    //   class MethodBase;
    

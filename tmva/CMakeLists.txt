@@ -20,15 +20,15 @@ set(headers1 Configurable.h Event.h Factory.h MethodBase.h MethodCompositeBase.h
 	     MethodANNBase.h MethodTMlpANN.h MethodRuleFit.h MethodCuts.h MethodFisher.h
 	     MethodKNN.h MethodCFMlpANN.h MethodCFMlpANN_Utils.h MethodLikelihood.h
 	     MethodHMatrix.h MethodPDERS.h MethodBDT.h MethodDT.h MethodSVM.h MethodBayesClassifier.h
-	     MethodFDA.h MethodMLP.h MethodBoost.h
+	     MethodFDA.h MethodMLP.h MethodCommittee.h MethodBoost.h
 	     MethodPDEFoam.h MethodLD.h MethodCategory.h)
 set(headers2 TSpline2.h TSpline1.h PDF.h BinaryTree.h BinarySearchTreeNode.h BinarySearchTree.h 
 	     Timer.h RootFinder.h CrossEntropy.h DecisionTree.h DecisionTreeNode.h MisClassificationError.h 
 	     Node.h SdivSqrtSplusB.h SeparationBase.h RegressionVariance.h Tools.h Reader.h 
 	     GeneticAlgorithm.h GeneticGenes.h GeneticPopulation.h GeneticRange.h GiniIndex.h 
-	     GiniIndexWithLaplace.h SimulatedAnnealing.h QuickMVAProbEstimator.h)
-set(headers3 Config.h KDEKernel.h Interval.h LogInterval.h FitterBase.h MCFitter.h GeneticFitter.h 
-         SimulatedAnnealingFitter.h MinuitFitter.h MinuitWrapper.h IFitterTarget.h
+	     GiniIndexWithLaplace.h SimulatedAnnealing.h)
+set(headers3 Config.h KDEKernel.h Interval.h FitterBase.h MCFitter.h GeneticFitter.h SimulatedAnnealingFitter.h
+         MinuitFitter.h MinuitWrapper.h IFitterTarget.h
          PDEFoam.h PDEFoamDecisionTree.h PDEFoamDensityBase.h PDEFoamDiscriminantDensity.h
          PDEFoamEventDensity.h PDEFoamTargetDensity.h PDEFoamDecisionTreeDensity.h PDEFoamMultiTarget.h
          PDEFoamVect.h PDEFoamCell.h PDEFoamDiscriminant.h PDEFoamEvent.h PDEFoamTarget.h
@@ -39,7 +39,7 @@ set(headers4 TNeuron.h TSynapse.h TActivationChooser.h TActivation.h TActivation
          TActivationTanh.h TActivationRadial.h TNeuronInputChooser.h TNeuronInput.h TNeuronInputSum.h
 	     TNeuronInputSqSum.h TNeuronInputAbs.h Types.h Ranking.h RuleFit.h RuleFitAPI.h IMethod.h MsgLogger.h
 	     VariableTransformBase.h VariableIdentityTransform.h VariableDecorrTransform.h VariablePCATransform.h 
-	     VariableGaussTransform.h VariableNormalizeTransform.h VariableRearrangeTransform.h ROCCalc.h)
+	     VariableGaussTransform.h VariableNormalizeTransform.h VariableRearrangeTransform.h)
 
 #---Need to suffix each header name by TMVA/  -----------------
 foreach(hs headers1 headers2 headers3 headers4)
@@ -59,19 +59,11 @@ ROOT_GENERATE_ROOTMAP(TMVA LINKDEF LinkDef1.h LinkDef2.h LinkDef3.h LinkDef4.h
 ROOT_LINKER_LIBRARY(TMVA *.cxx G__TMVA1.cxx G__TMVA2.cxx G__TMVA3.cxx G__TMVA4.cxx LIBRARIES Core Cint 
                     DEPENDENCIES RIO Hist Tree MLP Minuit XMLIO)
 
-install(DIRECTORY inc/TMVA/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/TMVA
-                            COMPONENT headers
+install(DIRECTORY inc/TMVA/ DESTINATION include/TMVA
                             PATTERN ".svn" EXCLUDE
                             REGEX "LinkDef" EXCLUDE )
-set_property(GLOBAL APPEND PROPERTY ROOT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/inc)
-
-if(NOT gnuinstall)
-  install(DIRECTORY test DESTINATION tmva 
-  FILES_MATCHING PATTERN "*.C" 
-                 PATTERN "*.gif" 
-                 PATTERN "*.png" 
-                 PATTERN "README"
-                 PATTERN "data" EXCLUDE)
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_INSTALL_PREFIX)
+  install(DIRECTORY test DESTINATION tmva PATTERN ".svn" EXCLUDE)
 endif()
 
 

@@ -30,7 +30,7 @@
 //                                                                          //
 // Interval definition, continuous and discrete                             //
 //                                                                          //
-// Interval(min,max)  : a continous interval [min,max]                      //
+// Interval(min,max)  : a continuous interval [min,max]                      //
 // Interval(min,max,n): a "discrete interval" [min,max], i.e the n numbers: //
 //          min, min+step, min+2*step,...., min+(n-1)*step, min+n*step=max  //
 //   e.g.: Interval(1,5,5)=1,2,3,4,5                                        //
@@ -39,33 +39,33 @@
 //  Note: **bin** counting starts from ZERO unlike in ROOT histograms       //
 //////////////////////////////////////////////////////////////////////////////
 /* Begin_Html
-   <center><h2>the TMVA::Interval Class</h2></center>
+<center><h2>the TMVA::Interval Class</h2></center>
 
-   <ul>
+<ul>
    <li> Interval definition, continuous and discrete
    <ul>
-   <li>  Interval(min,max)  : a continous interval [min,max]
-   <li>  Interval(min,max,n): a "discrete interval" [min,max], i.e the n numbers:<br>
-   min, min+step, min+2*step,...., min+(n-1)*step=max <br>
-   e.g.: Interval(1,5,5)=1,2,3,4,5                    <br>
-   Interval(.5,1.,6)= .5, .6., .7, .8, .9, 1.0        <br>
+         <li>  Interval(min,max)  : a continuous interval [min,max]
+         <li>  Interval(min,max,n): a "discrete interval" [min,max], i.e the n numbers:<br>
+         min, min+step, min+2*step,...., min+(n-1)*step=max <br>
+         e.g.: Interval(1,5,5)=1,2,3,4,5                    <br>
+         Interval(.5,1.,6)= .5, .6., .7, .8, .9, 1.0        <br>
 
    </ul>
-   </ul>
-   <pre>
+</ul>
+<pre>
 
-   Example:   Interval(.5,1.,6) 
+    Example:   Interval(.5,1.,6) 
 
-   [ min                           max ]                       
-   ------------------------------------------------------------
-   |     |     |     |     |     |
-   .5    .6    .7    .8    .9    1.0            
+             [ min                           max ]                       
+         ------------------------------------------------------------
+                |     |     |     |     |     |
+               .5    .6    .7    .8    .9    1.0            
  
-   bin    0     1     2     3     4     5  
+         bin    0     1     2     3     4     5  
 
 
-   </pre>
-   End_Html */
+</pre>
+End_Html */
 
 #include "TMath.h"
 #include "TRandom3.h"
@@ -87,7 +87,7 @@ TMVA::Interval::Interval( Double_t min, Double_t max, Int_t nbins ) :
 
    // defines minimum and maximum of an interval
    // when nbins > 0, interval describes a discrete distribution (equally distributed in the interval)
-   // when nbins == 0, interval describes a continous interval
+   // when nbins == 0, interval describes a continuous interval
    //
    if (fMax - fMin < 0) Log() << kFATAL << "maximum lower than minimum" << Endl;
    if (nbins < 0) {
@@ -129,21 +129,21 @@ Double_t TMVA::Interval::GetElement( Int_t bin ) const
       Log() << kFATAL << "bin " << bin << " out of range: interval *bins* count from 0 to " << fNbins-1  << Endl;
       return 0.0;
    }
-   return fMin + ( (Double_t(bin)/(fNbins-1)) *(fMax - fMin) );
+      return fMin + ( (Double_t(bin)/(fNbins-1)) *(fMax - fMin) );
 }
 
 //_______________________________________________________________________
-Double_t TMVA::Interval::GetStepSize( Int_t iBin )  const
+Double_t TMVA::Interval::GetStepSize( )  const
 {
    // retuns the step size between the numbers of a "discrete Interval" 
    if (fNbins <= 0) {
       Log() << kFATAL << "GetElement only defined for discrete value Intervals" << Endl;
+      return 0.0;
    }
-   if (iBin<0) {
-      Log() << kFATAL << "You asked for iBin=" << iBin
-            <<" in interval .. and.. sorry, I cannot let this happen.."<<Endl;
+   else { 
+      return (fMax-fMin)/(Double_t)(fNbins-1);
    }
-   return (fMax-fMin)/(Double_t)(fNbins-1);
+   
 }
 
 //_______________________________________________________________________
@@ -153,18 +153,4 @@ Double_t TMVA::Interval::GetRndm( TRandom3& rnd )  const
    return rnd.Rndm()*(fMax - fMin) + fMin;
 }
 
-Double_t TMVA::Interval::GetWidth() const 
-{ 
-   return fMax - fMin; 
-}
-Double_t TMVA::Interval::GetMean()  const 
-{ 
-   return (fMax + fMin)/2; 
-}
 
-void TMVA::Interval::Print(std::ostream &os) const 
-{
-   for (Int_t i=0; i<GetNbins(); i++){
-      os << "| " << GetElement(i)<<" |" ;
-   }  
-}

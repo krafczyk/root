@@ -51,18 +51,16 @@
 #include "TMVA/Config.h"
 #include "TMVA/MsgLogger.h"
 
-using std::min;
-
 REGISTER_METHOD(RuleFit)
 
 ClassImp(TMVA::MethodRuleFit)
  
 //_______________________________________________________________________
-   TMVA::MethodRuleFit::MethodRuleFit( const TString& jobName,
-                                       const TString& methodTitle,
-                                       DataSetInfo& theData, 
-                                       const TString& theOption,
-                                       TDirectory* theTargetDir ) :
+TMVA::MethodRuleFit::MethodRuleFit( const TString& jobName,
+                                    const TString& methodTitle,
+                                    DataSetInfo& theData, 
+                                    const TString& theOption,
+                                    TDirectory* theTargetDir ) :
    MethodBase( jobName, Types::kRuleFit, methodTitle, theData, theOption, theTargetDir )
    , fSignalFraction(0)
    , fNTImportance(0)
@@ -82,7 +80,6 @@ ClassImp(TMVA::MethodRuleFit)
    , fRFNendnodes(0)
    , fNTrees(0)
    , fTreeEveFrac(0)
-   , fSepType(0) 
    , fMinFracNEve(0)
    , fMaxFracNEve(0)
    , fNCuts(0)
@@ -129,7 +126,6 @@ TMVA::MethodRuleFit::MethodRuleFit( DataSetInfo& theData,
    , fRFNendnodes(0)
    , fNTrees(0)
    , fTreeEveFrac(0)
-   , fSepType(0) 
    , fMinFracNEve(0)
    , fMaxFracNEve(0)
    , fNCuts(0)
@@ -451,9 +447,9 @@ void TMVA::MethodRuleFit::TrainTMVARuleFit( void )
    // training of rules using TMVA implementation
 
    if (IsNormalised()) Log() << kFATAL << "\"Normalise\" option cannot be used with RuleFit; " 
-                             << "please remove the optoin from the configuration string, or "
-                             << "use \"!Normalise\""
-                             << Endl;
+                               << "please remove the optoin from the configuration string, or "
+                               << "use \"!Normalise\""
+                               << Endl;
 
    // timer
    Timer timer( 1, GetName() );
@@ -516,14 +512,7 @@ void TMVA::MethodRuleFit::TrainJFRuleFit( void )
    // training of rules using Jerome Friedmans implementation
 
    fRuleFit.InitPtrs( this );
-   Data()->SetCurrentType(Types::kTraining);
-   UInt_t nevents = Data()->GetNTrainingEvents();
-   std::vector<const TMVA::Event*> tmp;
-   for (Long64_t ievt=0; ievt<nevents; ievt++) {
-      const Event *event = GetEvent(ievt);
-      tmp.push_back(event);
-   }
-   fRuleFit.SetTrainingEvents( tmp );
+   fRuleFit.SetTrainingEvents( GetTrainingEvents() );
 
    RuleFitAPI *rfAPI = new RuleFitAPI( this, &fRuleFit, Log().GetMinType() );
 
@@ -576,9 +565,9 @@ void TMVA::MethodRuleFit::AddWeightsXMLTo( void* parent ) const
 }
 
 //_______________________________________________________________________
-void TMVA::MethodRuleFit::ReadWeightsFromStream( std::istream & istr )
+void TMVA::MethodRuleFit::ReadWeightsFromStream( istream & istr )
 {
-   // read rules from an std::istream
+   // read rules from an istream
 
    fRuleFit.GetRuleEnsemblePtr()->ReadRaw( istr );
 }
@@ -620,7 +609,7 @@ void TMVA::MethodRuleFit::MakeClassSpecific( std::ostream& fout, const TString& 
    fout << "void   " << className << "::Initialize(){}" << std::endl;
    fout << "void   " << className << "::Clear(){}" << std::endl;
    fout << "double " << className << "::GetMvaValue__( const std::vector<double>& inputValues ) const {" << std::endl;
-   fout << "   double rval=" << std::setprecision(10) << fRuleFit.GetRuleEnsemble().GetOffset() << ";" << std::endl;
+   fout << "   double rval=" << setprecision(10) << fRuleFit.GetRuleEnsemble().GetOffset() << ";" << std::endl;
    MakeClassRuleCuts(fout);
    MakeClassLinear(fout);
    fout << "   return rval;" << std::endl;
@@ -670,16 +659,16 @@ void TMVA::MethodRuleFit::MakeClassRuleCuts( std::ostream& fout ) const
          //
          if (ic>0) fout << "&&" << std::flush;
          if (domin) {
-            fout << "(" << std::setprecision(10) << valmin << std::flush;
+            fout << "(" << setprecision(10) << valmin << std::flush;
             fout << "<inputValues[" << sel << "])" << std::flush;
          }
          if (domax) {
             if (domin) fout << "&&" << std::flush;
             fout << "(inputValues[" << sel << "]" << std::flush;
-            fout << "<" << std::setprecision(10) << valmax << ")" <<std::flush;
+            fout << "<" << setprecision(10) << valmax << ")" <<std::flush;
          }
       }
-      fout << ") rval+=" << std::setprecision(10) << (*rules)[ir]->GetCoefficient() << ";" << std::flush;
+      fout << ") rval+=" << setprecision(10) << (*rules)[ir]->GetCoefficient() << ";" << std::flush;
       fout << "   // importance = " << Form("%3.3f",impr) << std::endl;
    }
    fout << std::setprecision(dp);
@@ -706,11 +695,11 @@ void TMVA::MethodRuleFit::MakeClassLinear( std::ostream& fout ) const
          Double_t norm = rens->GetLinNorm(il);
          Double_t imp  = rens->GetLinImportance(il)/rens->GetImportanceRef();
          fout << "   rval+="
-            //           << std::setprecision(10) << rens->GetLinCoefficients(il)*norm << "*std::min(" << setprecision(10) << rens->GetLinDP(il)
-            //           << ", std::max( inputValues[" << il << "]," << std::setprecision(10) << rens->GetLinDM(il) << "));"
-              << std::setprecision(10) << rens->GetLinCoefficients(il)*norm 
-              << "*std::min( double(" << std::setprecision(10) << rens->GetLinDP(il)
-              << "), std::max( double(inputValues[" << il << "]), double(" << std::setprecision(10) << rens->GetLinDM(il) << ")));"
+   //           << setprecision(10) << rens->GetLinCoefficients(il)*norm << "*std::min(" << setprecision(10) << rens->GetLinDP(il)
+   //           << ", std::max( inputValues[" << il << "]," << setprecision(10) << rens->GetLinDM(il) << "));"
+              << setprecision(10) << rens->GetLinCoefficients(il)*norm 
+              << "*std::min( double(" << setprecision(10) << rens->GetLinDP(il)
+              << "), std::max( double(inputValues[" << il << "]), double(" << setprecision(10) << rens->GetLinDM(il) << ")));"
               << std::flush;
          fout << "   // importance = " << Form("%3.3f",imp) << std::endl;
       }
@@ -776,21 +765,21 @@ void TMVA::MethodRuleFit::GetHelpMessage() const
    Log() << "I.  TUNING OF RULE ENSEMBLE:" << Endl;
    Log() << Endl;
    Log() << "   " << col << "ForestType  " << colres
-         << ": Recomended is to use the default \"AdaBoost\"." << brk << Endl;
+           << ": Recomended is to use the default \"AdaBoost\"." << brk << Endl;
    Log() << "   " << col << "nTrees      " << colres
-         << ": More trees leads to more rules but also slow" << Endl;
+           << ": More trees leads to more rules but also slow" << Endl;
    Log() << "                 performance. With too few trees the risk is" << Endl;
    Log() << "                 that the rule ensemble becomes too simple." << brk << Endl;
    Log() << "   " << col << "fEventsMin  " << colres << brk << Endl;
    Log() << "   " << col << "fEventsMax  " << colres
-         << ": With a lower min, more large trees will be generated" << Endl;
+           << ": With a lower min, more large trees will be generated" << Endl;
    Log() << "                 leading to more complex rules." << Endl;
    Log() << "                 With a higher max, more small trees will be" << Endl;
    Log() << "                 generated leading to more simple rules." << Endl;
    Log() << "                 By changing this range, the average complexity" << Endl;
    Log() << "                 of the rule ensemble can be controlled." << brk << Endl;
    Log() << "   " << col << "RuleMinDist " << colres
-         << ": By increasing the minimum distance between" << Endl;
+           << ": By increasing the minimum distance between" << Endl;
    Log() << "                 rules, fewer and more diverse rules will remain." << Endl;
    Log() << "                 Initially it is a good idea to keep this small" << Endl;
    Log() << "                 or zero and let the fitting do the selection of" << Endl;
@@ -801,13 +790,13 @@ void TMVA::MethodRuleFit::GetHelpMessage() const
    Log() << "II. TUNING OF THE FITTING:" << Endl;
    Log() << Endl;
    Log() << "   " << col << "GDPathEveFrac " << colres
-         << ": fraction of events in path evaluation" << Endl;
+           << ": fraction of events in path evaluation" << Endl;
    Log() << "                 Increasing this fraction will improve the path" << Endl;
    Log() << "                 finding. However, a too high value will give few" << Endl;
    Log() << "                 unique events available for error estimation." << Endl;
    Log() << "                 It is recomended to usethe default = 0.5." << brk << Endl;
    Log() << "   " << col << "GDTau         " << colres
-         << ": cutoff parameter tau" << Endl;
+           << ": cutoff parameter tau" << Endl;
    Log() << "                 By default this value is set to -1.0." << Endl;
    //         "|----------------|---------------------------------------------|"
    Log() << "                 This means that the cut off parameter is" << Endl;
@@ -816,11 +805,11 @@ void TMVA::MethodRuleFit::GetHelpMessage() const
    Log() << "                 to fix this value if you already know it" << Endl;
    Log() << "                 and want to reduce on training time." << brk << Endl;
    Log() << "   " << col << "GDTauPrec     " << colres
-         << ": precision of estimated tau" << Endl;
+           << ": precision of estimated tau" << Endl;
    Log() << "                 Increase this precision to find a more" << Endl;
    Log() << "                 optimum cut-off parameter." << brk << Endl;
    Log() << "   " << col << "GDNStep       " << colres
-         << ": number of steps in path search" << Endl;
+           << ": number of steps in path search" << Endl;
    Log() << "                 If the number of steps is too small, then" << Endl;
    Log() << "                 the program will give a warning message." << Endl;
    Log() << Endl;
@@ -839,11 +828,11 @@ void TMVA::MethodRuleFit::GetHelpMessage() const
    Log() << "                 the fitting fails." << Endl;
    Log() << "                 A remedy may be to increase the value" << brk << Endl;
    Log() << "                 "
-         << col << "GDValidEveFrac" << colres
-         << " to 1.0 (or a larger value)." << brk << Endl;
+           << col << "GDValidEveFrac" << colres
+           << " to 1.0 (or a larger value)." << brk << Endl;
    Log() << "                 In addition, if "
-         << col << "GDPathEveFrac" << colres
-         << " is too high" << Endl;
+           << col << "GDPathEveFrac" << colres
+           << " is too high" << Endl;
    Log() << "                 the same warnings may occur since the events" << Endl;
    Log() << "                 used for error estimation are also used for" << Endl;
    Log() << "                 path estimation." << Endl;
@@ -851,15 +840,15 @@ void TMVA::MethodRuleFit::GetHelpMessage() const
    Log() << "                 See above on tuning the rule ensemble." << Endl;
    Log() << Endl;
    Log() << col << "The error rate was still decreasing at the end of the path"
-         << colres << Endl;
+           << colres << Endl;
    Log() << "                 Too few steps in path! Increase "
-         << col << "GDNSteps" <<  colres << "." << Endl;
+           << col << "GDNSteps" <<  colres << "." << Endl;
    Log() << Endl;
    Log() << col << "Reached minimum early in the search" << colres << Endl;
 
    Log() << "                 Minimum was found early in the fitting. This" << Endl;
    Log() << "                 may indicate that the used step size "
-         << col << "GDStep" <<  colres << "." << Endl;
+           << col << "GDStep" <<  colres << "." << Endl;
    Log() << "                 was too large. Reduce it and rerun." << Endl;
    Log() << "                 If the results still are not OK, modify the" << Endl;
    Log() << "                 model either by modifying the rule ensemble" << Endl;
