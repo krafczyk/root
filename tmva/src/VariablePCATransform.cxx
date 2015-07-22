@@ -74,7 +74,7 @@ void TMVA::VariablePCATransform::Initialize()
 }
 
 //_______________________________________________________________________
-Bool_t TMVA::VariablePCATransform::PrepareTransformation (const std::vector<Event*>& events)
+Bool_t TMVA::VariablePCATransform::PrepareTransformation( const std::vector<Event*>& events )
 {
    // calculate the principal components using the ROOT class TPrincipal
    // and the normalization
@@ -117,8 +117,8 @@ const TMVA::Event* TMVA::VariablePCATransform::Transform( const Event* const ev,
    // apply the principal component analysis
    if (!IsCreated()) return 0;
 
-   //   const Int_t inputSize = fGet.size();
-   //   const UInt_t nCls = GetNClasses();
+//   const Int_t inputSize = fGet.size();
+//   const UInt_t nCls = GetNClasses();
 
    // if we have more than one class, take the last PCA analysis where all classes are combined if
    // the cls parameter is outside the defined classes
@@ -145,7 +145,7 @@ const TMVA::Event* TMVA::VariablePCATransform::Transform( const Event* const ev,
       UInt_t numMasked = std::count(mask.begin(), mask.end(), (Char_t)kTRUE);
       UInt_t numOK     = std::count(mask.begin(), mask.end(), (Char_t)kFALSE);
       if( numMasked>0 && numOK>0 ){
-         Log() << kFATAL << "You mixed variables and targets in the decorrelation transformation. This is not possible." << Endl;
+	 Log() << kFATAL << "You mixed variables and targets in the decorrelation transformation. This is not possible." << Endl;
       }
       SetOutput( fTransformedEvent, input, mask, ev );
       return fTransformedEvent;
@@ -162,10 +162,10 @@ const TMVA::Event* TMVA::VariablePCATransform::InverseTransform( const Event* co
 {
    // apply the principal component analysis
    // TODO: implementation of inverse transformation
-   //    Log() << kFATAL << "Inverse transformation for PCA transformation not yet implemented. Hence, this transformation cannot be applied together with regression. Please contact the authors if necessary." << Endl;
+//    Log() << kFATAL << "Inverse transformation for PCA transformation not yet implemented. Hence, this transformation cannot be applied together with regression. Please contact the authors if necessary." << Endl;
 
    if (!IsCreated()) return 0;
-   //   const Int_t inputSize = fGet.size();
+//   const Int_t inputSize = fGet.size();
    const UInt_t nCls = GetNClasses();
    //UInt_t evCls = ev->GetClass();
 
@@ -189,7 +189,7 @@ const TMVA::Event* TMVA::VariablePCATransform::InverseTransform( const Event* co
 }
 
 //_______________________________________________________________________
-void TMVA::VariablePCATransform::CalculatePrincipalComponents( const std::vector< Event*>& events )
+void TMVA::VariablePCATransform::CalculatePrincipalComponents( const std::vector<Event*>& events )
 {
    // calculate the principal components for the signal and the background data
    // it uses the MakePrincipal method of ROOT's TPrincipal class
@@ -218,22 +218,22 @@ void TMVA::VariablePCATransform::CalculatePrincipalComponents( const std::vector
    std::vector<Float_t> input;
    std::vector<Char_t>  mask;
    for (ievt=0; ievt<entries; ievt++) {
-      const Event* ev = events[ievt];
+      Event* ev = events[ievt];
       UInt_t cls = ev->GetClass();
 
       Bool_t hasMaskedEntries = GetInput( ev, input, mask );
       if (hasMaskedEntries){
-         Log() << kWARNING << "Print event which triggers an error" << Endl;
-         ev->Print(Log());
-         Log() << kFATAL << "Masked entries found in event read in when calculating the principal components for the PCA transformation." << Endl;
+	 Log() << kWARNING << "Print event which triggers an error" << Endl;
+	 ev->Print(Log());
+	 Log() << kFATAL << "Masked entries found in event read in when calculating the principal components for the PCA transformation." << Endl;
       }
 
       UInt_t iinp = 0;
       for( std::vector<Float_t>::iterator itInp = input.begin(), itInpEnd = input.end(); itInp != itInpEnd; ++itInp )
       {
-         Float_t value = (*itInp);
-         dvec[iinp] = (Double_t)value;
-         ++iinp;
+	 Float_t value = (*itInp);
+	 dvec[iinp] = (Double_t)value;
+	 ++iinp;
       }
 
       pca.at(cls)->AddRow( dvec );

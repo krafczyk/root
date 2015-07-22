@@ -40,11 +40,11 @@ REGISTER_METHOD(BayesClassifier)
 ClassImp(TMVA::MethodBayesClassifier)
 
 //_______________________________________________________________________
-   TMVA::MethodBayesClassifier::MethodBayesClassifier( const TString& jobName,
-                                                       const TString& methodTitle,
-                                                       DataSetInfo& theData, 
-                                                       const TString& theOption,
-                                                       TDirectory* theTargetDir ) :
+TMVA::MethodBayesClassifier::MethodBayesClassifier( const TString& jobName,
+                                                    const TString& methodTitle,
+                                                    DataSetInfo& theData, 
+                                                    const TString& theOption,
+                                                    TDirectory* theTargetDir ) :
    TMVA::MethodBase( jobName, Types::kBayesClassifier, methodTitle, theData, theOption, theTargetDir )
 {
    // standard constructor
@@ -104,7 +104,7 @@ void TMVA::MethodBayesClassifier::AddWeightsXMLTo( void* /*parent*/ ) const {
 }
   
 //_______________________________________________________________________
-void  TMVA::MethodBayesClassifier::ReadWeightsFromStream( std::istream & )
+void  TMVA::MethodBayesClassifier::ReadWeightsFromStream( istream & )
 {
    // read back the training results from a file (stream)
 }
@@ -125,8 +125,8 @@ Double_t TMVA::MethodBayesClassifier::GetMvaValue( Double_t* err, Double_t* errU
 void TMVA::MethodBayesClassifier::MakeClassSpecific( std::ostream& fout, const TString& className ) const
 {
    // write specific classifier response
-   fout << "   // not implemented for class: \"" << className << "\"" << std::endl;
-   fout << "};" << std::endl;
+   fout << "   // not implemented for class: \"" << className << "\"" << endl;
+   fout << "};" << endl;
 }
 
 //_______________________________________________________________________

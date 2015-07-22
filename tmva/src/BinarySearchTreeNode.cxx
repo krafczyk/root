@@ -51,12 +51,12 @@ ClassImp(TMVA::BinarySearchTreeNode)
 
 //_______________________________________________________________________
 TMVA::BinarySearchTreeNode::BinarySearchTreeNode( const Event* e, UInt_t /* signalClass */ ) 
-: TMVA::Node(),
-   fEventV  ( std::vector<Float_t>() ),
-   fTargets ( std::vector<Float_t>() ),
-   fWeight  ( e==0?0:e->GetWeight()  ),
-   fClass   ( e==0?0:e->GetClass() ), // see BinarySearchTree.h, line Mean() RMS() Min() and Max()
-   fSelector( -1 )
+   : TMVA::Node(),
+     fEventV  ( std::vector<Float_t>() ),
+     fTargets ( std::vector<Float_t>() ),
+     fWeight  ( e==0?0:e->GetWeight()  ),
+     fClass   ( e==0?0:e->GetClass() ), // see BinarySearchTree.h, line Mean() RMS() Min() and Max()
+     fSelector( -1 )
 {
    // constructor of a node for the search tree
    if (e!=0) {
@@ -135,7 +135,7 @@ Bool_t TMVA::BinarySearchTreeNode::EqualsMe(const TMVA::Event& e) const
 }
 
 //_______________________________________________________________________
-void TMVA::BinarySearchTreeNode::Print( std::ostream& os ) const
+void TMVA::BinarySearchTreeNode::Print( ostream& os ) const
 {
    // print the node
    os << "< ***  " << std::endl << " node.Data: ";
@@ -155,7 +155,7 @@ void TMVA::BinarySearchTreeNode::Print( std::ostream& os ) const
 }
 
 //_______________________________________________________________________
-void TMVA::BinarySearchTreeNode::PrintRec( std::ostream& os ) const
+void TMVA::BinarySearchTreeNode::PrintRec( ostream& os ) const
 {
    // recursively print the node and its daughters (--> print the 'tree')
    os << this->GetDepth() << " " << this->GetPos() << " " << this->GetSelector()
@@ -171,7 +171,7 @@ void TMVA::BinarySearchTreeNode::PrintRec( std::ostream& os ) const
 }
 
 //_______________________________________________________________________
-Bool_t TMVA::BinarySearchTreeNode::ReadDataRecord( std::istream& is, UInt_t /* Tmva_Version_Code */  ) 
+Bool_t TMVA::BinarySearchTreeNode::ReadDataRecord( istream& is, UInt_t /* Tmva_Version_Code */  ) 
 {
    // Read the data block
    Int_t       itmp;
@@ -217,7 +217,7 @@ void TMVA::BinarySearchTreeNode::ReadAttributes(void* node, UInt_t /* tmva_Versi
       fClass=0;
    if (sb=="1")
       fClass=1;
-   //   fClass = (sb=="Signal")?0:1;
+//   fClass = (sb=="Signal")?0:1;
    Int_t nvars;
    gTools().ReadAttr(node, "NVars",nvars);
    fEventV.resize(nvars);
@@ -229,7 +229,7 @@ void TMVA::BinarySearchTreeNode::AddAttributesToNode(void* node) const {
    // adding attributes to tree node
    gTools().AddAttr(node, "selector", fSelector );
    gTools().AddAttr(node, "weight", fWeight );
-   //   gTools().AddAttr(node, "type", (IsSignal()?"Signal":"Background"));
+//   gTools().AddAttr(node, "type", (IsSignal()?"Signal":"Background"));
    gTools().AddAttr(node, "type", GetClass());
    gTools().AddAttr(node, "NVars", fEventV.size());
 }

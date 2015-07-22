@@ -81,7 +81,7 @@ namespace TMVA {
       void AddWeightsXMLTo     ( void* parent ) const;
 
       // read weights from file
-      void ReadWeightsFromStream( std::istream& istr );
+      void ReadWeightsFromStream( istream& istr );
       void ReadWeightsFromXML   ( void* wghtnode );
 
       // calculate the MVA value

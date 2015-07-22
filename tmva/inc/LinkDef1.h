@@ -34,6 +34,7 @@
 #pragma link C++ class TMVA::MethodBayesClassifier+;
 #pragma link C++ class TMVA::MethodFDA+;
 #pragma link C++ class TMVA::MethodMLP+;
+#pragma link C++ class TMVA::MethodCommittee+;
 #pragma link C++ class TMVA::MethodBoost+;
 #pragma link C++ class TMVA::MethodPDEFoam+;
 #pragma link C++ class TMVA::MethodLD+;

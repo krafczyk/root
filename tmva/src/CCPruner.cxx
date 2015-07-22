@@ -24,14 +24,13 @@
 #include "TMVA/GiniIndex.h"
 #include "TMVA/MisClassificationError.h"
 #include "TMVA/CCTreeWrapper.h"
-#include "TMVA/DataSet.h"
 
 #include <iostream>
 #include <fstream>
 #include <limits>
 #include <math.h>
 
-using namespace TMVA;
+ using namespace TMVA;
 
 //_______________________________________________________________________
 CCPruner::CCPruner( DecisionTree* t_max, const EventList* validationSample,
@@ -99,7 +98,7 @@ void CCPruner::Optimize( )
    Double_t epsilon = std::numeric_limits<double>::epsilon();
    Double_t alpha = -1.0e10;
 
-   std::ofstream outfile;
+   ofstream outfile;
    if (fDebug) outfile.open("costcomplexity.log");
    if(!HaveStopCondition && (fValidationSample == NULL && fValidationDataSet == NULL) ) {
       if (fDebug) outfile << "ERROR: no validation sample, so cannot optimize pruning!" << std::endl;

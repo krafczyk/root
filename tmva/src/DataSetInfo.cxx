@@ -70,10 +70,6 @@ TMVA::DataSetInfo::DataSetInfo(const TString& name)
      fClasses( 0 ),
      fNormalization( "NONE" ),
      fSplitOptions(""),
-     fTrainingSumSignalWeights(-1),
-     fTrainingSumBackgrWeights(-1),
-     fTestingSumSignalWeights (-1),
-     fTestingSumBackgrWeights (-1),
      fOwnRootDir(0),
      fVerbose( kFALSE ),
      fSignalClass(0),
@@ -167,7 +163,7 @@ Bool_t TMVA::DataSetInfo::IsSignal( const TMVA::Event* ev ) const
 std::vector<Float_t>*  TMVA::DataSetInfo::GetTargetsForMulticlass( const TMVA::Event* ev ) 
 {
    if( !fTargetsForMulticlass ) fTargetsForMulticlass = new std::vector<Float_t>( GetNClasses() );
-   //   fTargetsForMulticlass->resize( GetNClasses() );
+//   fTargetsForMulticlass->resize( GetNClasses() );
    fTargetsForMulticlass->assign( GetNClasses(), 0.0 );
    fTargetsForMulticlass->at( ev->GetClass() ) = 1.0;
    return fTargetsForMulticlass;
@@ -433,7 +429,7 @@ TMVA::DataSet* TMVA::DataSetInfo::GetDataSet() const
    // returns data set
    if (fDataSet==0 || fNeedsRebuilding) {
       if(fDataSet!=0) ClearDataSet();
-      //      fDataSet = DataSetManager::Instance().CreateDataSet(GetName()); //DSMTEST replaced by following lines
+//      fDataSet = DataSetManager::Instance().CreateDataSet(GetName()); //DSMTEST replaced by following lines
       if( !fDataSetManager )
          Log() << kFATAL << "DataSetManager has not been set in DataSetInfo (GetDataSet() )." << Endl;
       fDataSet = fDataSetManager->CreateDataSet(GetName());
@@ -464,23 +460,5 @@ Int_t TMVA::DataSetInfo::GetClassNameMaxLength() const
    }
 
    return maxL;
-}
-
-
-Double_t TMVA::DataSetInfo::GetTrainingSumSignalWeights(){
-   if (fTrainingSumSignalWeights<0) Log() << kFATAL << " asking for the sum of training signal event weights which is not initicalised yet" << Endl;
-   return fTrainingSumSignalWeights;
-}
-Double_t TMVA::DataSetInfo::GetTrainingSumBackgrWeights(){
-   if (fTrainingSumBackgrWeights<0) Log() << kFATAL << " asking for the sum of training backgr event weights which is not initicalised yet" << Endl;
-   return fTrainingSumBackgrWeights;
-}
-Double_t TMVA::DataSetInfo::GetTestingSumSignalWeights (){
-   if (fTestingSumSignalWeights<0) Log() << kFATAL << " asking for the sum of testing signal event weights which is not initicalised yet" << Endl;
-   return fTestingSumSignalWeights ;
-}
-Double_t TMVA::DataSetInfo::GetTestingSumBackgrWeights (){
-   if (fTestingSumBackgrWeights<0) Log() << kFATAL << " asking for the sum of testing backgr event weights which is not initicalised yet" << Endl;
-   return fTestingSumBackgrWeights ;
 }
 

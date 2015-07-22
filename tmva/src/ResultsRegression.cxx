@@ -32,9 +32,9 @@
 #include "TMVA/DataSet.h"
 
 //_______________________________________________________________________
-TMVA::ResultsRegression::ResultsRegression( const DataSetInfo* dsi, TString resultsName  ) 
-   : Results( dsi, resultsName  ),
-     fLogger( new MsgLogger(Form("ResultsRegression%s",resultsName.Data()) , kINFO) )
+TMVA::ResultsRegression::ResultsRegression( const DataSetInfo* dsi ) 
+   : Results( dsi ),
+     fLogger( new MsgLogger("ResultsRegression", kINFO) )
 {
    // constructor
 }
@@ -63,16 +63,16 @@ TH1F*  TMVA::ResultsRegression::QuadraticDeviation( UInt_t tgtNum , Bool_t trunc
    VariableInfo vinf = dsi->GetTargetInfo(tgtNum);
    Float_t xmin=0., xmax=0.;
    if (truncate){
-      xmax = truncvalue;
+     xmax = truncvalue;
    }
    else{
-      for (Int_t ievt=0; ievt<ds->GetNEvents(); ievt++) {
-         const Event* ev = ds->GetEvent(ievt);
-         std::vector<Float_t> regVal = fRegValues.at(ievt);
-         Float_t val = regVal.at( tgtNum ) - ev->GetTarget( tgtNum );
-         val *= val;
-         xmax = val> xmax? val: xmax;
-      } 
+     for (Int_t ievt=0; ievt<ds->GetNEvents(); ievt++) {
+       Event* ev = ds->GetEvent(ievt);
+       std::vector<Float_t> regVal = fRegValues.at(ievt);
+       Float_t val = regVal.at( tgtNum ) - ev->GetTarget( tgtNum );
+       val *= val;
+       xmax = val> xmax? val: xmax;
+     } 
    }
    xmax *= 1.1;
    Int_t nbins = 500;
@@ -82,7 +82,7 @@ TH1F*  TMVA::ResultsRegression::QuadraticDeviation( UInt_t tgtNum , Bool_t trunc
    h->GetYaxis()->SetTitle("Weighted Entries");
 
    for (Int_t ievt=0; ievt<ds->GetNEvents(); ievt++) {
-      const Event* ev = ds->GetEvent(ievt);
+      Event* ev = ds->GetEvent(ievt);
       std::vector<Float_t> regVal = fRegValues.at(ievt);
       Float_t val = regVal.at( tgtNum ) - ev->GetTarget( tgtNum );
       val *= val;
@@ -112,7 +112,7 @@ TH2F*  TMVA::ResultsRegression::DeviationAsAFunctionOf( UInt_t varNum, UInt_t tg
       xmax = vinf.GetMax();
 
       for (Int_t ievt=0; ievt<ds->GetNEvents(); ievt++) {
-         const Event* ev = ds->GetEvent(ievt);
+         Event* ev = ds->GetEvent(ievt);
          Float_t val = ev->GetValue(varNum);
 
          if (val < xmin ) xmin = val;
@@ -126,7 +126,7 @@ TH2F*  TMVA::ResultsRegression::DeviationAsAFunctionOf( UInt_t varNum, UInt_t tg
       xmax = vinf.GetMax();
 
       for (Int_t ievt=0; ievt<ds->GetNEvents(); ievt++) {
-         const Event* ev = ds->GetEvent(ievt);
+         Event* ev = ds->GetEvent(ievt);
          Float_t val = ev->GetTarget(varNum);
 
          if (val < xmin ) xmin = val;
@@ -138,7 +138,7 @@ TH2F*  TMVA::ResultsRegression::DeviationAsAFunctionOf( UInt_t varNum, UInt_t tg
    Float_t ymax = -FLT_MAX;
 
    for (Int_t ievt=0; ievt<ds->GetNEvents(); ievt++) {
-      const Event* ev = ds->GetEvent(ievt);
+      Event* ev = ds->GetEvent(ievt);
       std::vector<Float_t> regVal = fRegValues.at(ievt);
 
       Float_t diff = regVal.at( tgtNum ) - ev->GetTarget( tgtNum );
@@ -167,7 +167,7 @@ TH2F*  TMVA::ResultsRegression::DeviationAsAFunctionOf( UInt_t varNum, UInt_t tg
    h->GetYaxis()->SetTitle( yName );
 
    for (Int_t ievt=0; ievt<ds->GetNEvents(); ievt++) {
-      const Event* ev = ds->GetEvent(ievt);
+      Event* ev = ds->GetEvent(ievt);
       std::vector<Float_t> regVal = fRegValues.at(ievt);
 
       Float_t xVal = (takeTargets?ev->GetTarget( varNum ):ev->GetValue( varNum ));
@@ -207,19 +207,19 @@ void  TMVA::ResultsRegression::CreateDeviationHistograms( TString prefix )
 
    Log() << kINFO << "Create regression average deviation" << Endl;
    for (UInt_t itgt = 0; itgt < dsi->GetNTargets(); itgt++) {
-      TH1F* h =  QuadraticDeviation(itgt);
-      TString name( Form("%s_Quadr_Deviation_target_%d_",prefix.Data(),itgt) );
-      h->SetName( name );
-      h->SetTitle( name );
-      Double_t yq[1], xq[]={0.9};
-      h->GetQuantiles(1,yq,xq);
-      Store( h );
+     TH1F* h =  QuadraticDeviation(itgt);
+     TString name( Form("%s_Quadr_Deviation_target_%d_",prefix.Data(),itgt) );
+     h->SetName( name );
+     h->SetTitle( name );
+     Double_t yq[1], xq[]={0.9};
+     h->GetQuantiles(1,yq,xq);
+     Store( h );
 
-      TH1F* htrunc = QuadraticDeviation(itgt, true, yq[0]);
-      TString name2( Form("%s_Quadr_Dev_best90perc_target_%d_",prefix.Data(),itgt) );
-      htrunc->SetName( name2 );
-      htrunc->SetTitle( name2 );
-      Store( htrunc );
+     TH1F* htrunc = QuadraticDeviation(itgt, true, yq[0]);
+     TString name2( Form("%s_Quadr_Dev_best90perc_target_%d_",prefix.Data(),itgt) );
+     htrunc->SetName( name2 );
+     htrunc->SetTitle( name2 );
+     Store( htrunc );
    }
    Log() << kINFO << "Results created" << Endl;
 }

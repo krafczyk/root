@@ -35,6 +35,5 @@
 #pragma link C++ class TMVA::GiniIndex+;
 #pragma link C++ class TMVA::GiniIndexWithLaplace+;
 #pragma link C++ class TMVA::SimulatedAnnealing+;
-#pragma link C++ class TMVA::QuickMVAProbEstimator+;
 
 #endif

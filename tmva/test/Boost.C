@@ -12,6 +12,7 @@
 #include "TSystem.h"
 #include "TROOT.h"
 
+#include "TMVAGui.C"
 
 #ifndef __CINT__
 #include "TMVA/Tools.h"
@@ -21,16 +22,6 @@
 using namespace TMVA;
 
 void Boost(){
-   // This loads the library
-   TMVA::Tools::Instance();
-
-   // to get access to the GUI and all tmva macros
-   TString tmva_dir = gSystem->DirName(gSystem->DirName(gInterpreter->GetCurrentMacroName()));
-   if(gSystem->Getenv("TMVASYS"))
-      tmva_dir = TString(gSystem->Getenv("TMVASYS"));
-   gROOT->SetMacroPath(tmva_dir + "/test/:" + gROOT->GetMacroPath() );
-   gROOT->ProcessLine(".L TMVAGui.C");
-
    TString outfileName = "boost.root";
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
    TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification", outputFile,
@@ -45,8 +36,7 @@ void Boost(){
       input = TFile::Open( fname );
    }
    else {
-      TString dir = gSystem->DirName(gInterpreter->GetCurrentMacroName());
-      gROOT->LoadMacro( dir + "/createData.C");
+      gROOT->LoadMacro( "./createData.C");
       create_circ(20000);
       cout << " created data.root with data and circle arranged in half circles"<<endl;
       input = TFile::Open( fname );

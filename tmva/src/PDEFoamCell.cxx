@@ -41,19 +41,19 @@ ClassImp(TMVA::PDEFoamCell)
 
 //_____________________________________________________________________
 TMVA::PDEFoamCell::PDEFoamCell()
-: TObject(),
-   fDim(0),
-   fSerial(0),
-   fStatus(1),
-   fParent(0),
-   fDaught0(0),
-   fDaught1(0),
-   fXdiv(0.0),
-   fBest(0),
-   fVolume(0.0),
-   fIntegral(0.0),
-   fDrive(0.0),
-   fElement(0)
+   : TObject(),
+     fDim(0),
+     fSerial(0),
+     fStatus(1),
+     fParent(0),
+     fDaught0(0),
+     fDaught1(0),
+     fXdiv(0.0),
+     fBest(0),
+     fVolume(0.0),
+     fIntegral(0.0),
+     fDrive(0.0),
+     fElement(0)
 {
    // Default constructor for streamer
 }
@@ -231,23 +231,23 @@ void TMVA::PDEFoamCell::Print(Option_t *option) const
 
    if (!option) Error( "Print", "No option set\n");
 
-   std::cout <<  " Status= "<<     fStatus   <<",";
-   std::cout <<  " Volume= "<<     fVolume   <<",";
-   std::cout <<  " TrueInteg= " << fIntegral <<",";
-   std::cout <<  " DriveInteg= "<< fDrive    <<",";
-   std::cout << std::endl;;
-   std::cout <<  " Xdiv= "<<fXdiv<<",";
-   std::cout <<  " Best= "<<fBest<<",";
-   std::cout <<  " Parent=  {"<< (GetPare() ? GetPare()->GetSerial() : -1) <<"} "; // extra DEBUG
-   std::cout <<  " Daught0= {"<< (GetDau0() ? GetDau0()->GetSerial() : -1 )<<"} "; // extra DEBUG
-   std::cout <<  " Daught1= {"<< (GetDau1() ? GetDau1()->GetSerial()  : -1 )<<"} "; // extra DEBUG
-   std::cout << std::endl;;
+   cout <<  " Status= "<<     fStatus   <<",";
+   cout <<  " Volume= "<<     fVolume   <<",";
+   cout <<  " TrueInteg= " << fIntegral <<",";
+   cout <<  " DriveInteg= "<< fDrive    <<",";
+   cout << endl;
+   cout <<  " Xdiv= "<<fXdiv<<",";
+   cout <<  " Best= "<<fBest<<",";
+   cout <<  " Parent=  {"<< (GetPare() ? GetPare()->GetSerial() : -1) <<"} "; // extra DEBUG
+   cout <<  " Daught0= {"<< (GetDau0() ? GetDau0()->GetSerial() : -1 )<<"} "; // extra DEBUG
+   cout <<  " Daught1= {"<< (GetDau1() ? GetDau1()->GetSerial()  : -1 )<<"} "; // extra DEBUG
+   cout << endl;
    //
    //
    if (fDim>0 ) {
       PDEFoamVect cellPosi(fDim); PDEFoamVect cellSize(fDim);
       GetHcub(cellPosi,cellSize);
-      std::cout <<"   Posi= "; cellPosi.Print("1"); std::cout<<","<< std::endl;;
-      std::cout <<"   Size= "; cellSize.Print("1"); std::cout<<","<< std::endl;;
+      cout <<"   Posi= "; cellPosi.Print("1"); cout<<","<< endl;
+      cout <<"   Size= "; cellSize.Print("1"); cout<<","<< endl;
    }
 }

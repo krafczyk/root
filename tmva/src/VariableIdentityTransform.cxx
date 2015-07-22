@@ -35,8 +35,8 @@
 ClassImp(TMVA::VariableIdentityTransform)
 
 //_______________________________________________________________________
-TMVA::VariableIdentityTransform::VariableIdentityTransform( DataSetInfo& dsi )
-: VariableTransformBase( dsi, Types::kIdentity, "Id" )
+   TMVA::VariableIdentityTransform::VariableIdentityTransform( DataSetInfo& dsi )
+      : VariableTransformBase( dsi, Types::kIdentity, "Id" )
 {
    // constructor
 }
@@ -48,7 +48,7 @@ void TMVA::VariableIdentityTransform::Initialize()
 }
 
 //_______________________________________________________________________
-Bool_t TMVA::VariableIdentityTransform::PrepareTransformation (const std::vector<Event*>& events)
+Bool_t TMVA::VariableIdentityTransform::PrepareTransformation( const std::vector<Event*>& events)
 {
    // the identity does not need to be prepared, only calculate the normalization
    Initialize();

@@ -80,11 +80,6 @@ namespace TMVA {
       // Add a predefined value to the last declared option
       template<class T>
       void AddPreDefVal(const T&);
-
-      // Add a predefined value to the option named optname
-      template<class T>
-      void AddPreDefVal(const TString&optname ,const T&);
-
       
       void CheckForUnusedOptions() const;
 
@@ -92,7 +87,7 @@ namespace TMVA {
       void SetOptions(const TString& s) { fOptions = s; }
 
       void WriteOptionsToStream ( std::ostream& o, const TString& prefix ) const;
-      void ReadOptionsFromStream( std::istream& istr );
+      void ReadOptionsFromStream( istream& istr );
 
       void AddOptionsXMLTo( void* parent ) const;
       void ReadOptionsFromXML( void* node );
@@ -176,36 +171,9 @@ TMVA::OptionBase* TMVA::Configurable::DeclareOptionRef( T*& ref, Int_t size, con
 template<class T>
 void TMVA::Configurable::AddPreDefVal(const T& val) 
 {
-   // add predefined option value to the last declared option
+   // add predefined option value
    Option<T>* oc = dynamic_cast<Option<T>*>(fLastDeclaredOption);
    if(oc!=0) oc->AddPreDefVal(val);
-}
-
-//______________________________________________________________________
-template<class T>
-void TMVA::Configurable::AddPreDefVal(const TString &optname, const T& val) 
-{
-   // add predefined option value to the option named optname
-
-  TListIter optIt( &fListOfOptions );   
-  while (OptionBase * op = (OptionBase *) optIt()) {
-    if (optname == TString(op->TheName())){
-      Option<T>* oc = dynamic_cast<Option<T>*>(op);
-      if(oc!=0){
-        oc->AddPreDefVal(val);
-        return;
-      }
-      else{
-        Log() << kFATAL << "Option \"" << optname 
-              << "\" was found, but somehow I could not convert the pointer propperly.. please check the syntax of your option declaration" << Endl;
-        return;
-      }
-      
-    }
-  }
-  Log() << kFATAL << "Option \"" << optname 
-        << "\" is not declared, hence cannot add predefined value, please check the syntax of your option declaration" << Endl;
-  
 }
 
 //______________________________________________________________________

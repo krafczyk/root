@@ -64,8 +64,8 @@ TMVA::MethodCompositeBase::MethodCompositeBase( const TString& jobName,
                                                 DataSetInfo& theData,
                                                 const TString& theOption,
                                                 TDirectory* theTargetDir )
-: TMVA::MethodBase( jobName, methodType, methodTitle, theData, theOption, theTargetDir ),
-   fCurrentMethodIdx(0), fCurrentMethod(0)
+   : TMVA::MethodBase( jobName, methodType, methodTitle, theData, theOption, theTargetDir ),
+     fMethodIndex(0)
 {}
 
 //_______________________________________________________________________
@@ -74,15 +74,15 @@ TMVA::MethodCompositeBase::MethodCompositeBase( Types::EMVA methodType,
                                                 const TString& weightFile,
                                                 TDirectory* theTargetDir )
    : TMVA::MethodBase( methodType, dsi, weightFile, theTargetDir ),
-     fCurrentMethodIdx(0), fCurrentMethod(0)     
+     fMethodIndex(0)
 {}
 
 //_______________________________________________________________________
 TMVA::IMethod* TMVA::MethodCompositeBase::GetMethod( const TString &methodTitle ) const
 {
    // returns pointer to MVA that corresponds to given method title
-   std::vector<IMethod*>::const_iterator itrMethod    = fMethods.begin();
-   std::vector<IMethod*>::const_iterator itrMethodEnd = fMethods.end();
+   vector<IMethod*>::const_iterator itrMethod    = fMethods.begin();
+   vector<IMethod*>::const_iterator itrMethodEnd = fMethods.end();
 
    for (; itrMethod != itrMethodEnd; itrMethod++) {
       MethodBase* mva = dynamic_cast<MethodBase*>(*itrMethod);
@@ -95,7 +95,7 @@ TMVA::IMethod* TMVA::MethodCompositeBase::GetMethod( const TString &methodTitle 
 TMVA::IMethod* TMVA::MethodCompositeBase::GetMethod( const Int_t index ) const
 {
    // returns pointer to MVA that corresponds to given method index
-   std::vector<IMethod*>::const_iterator itrMethod = fMethods.begin()+index;
+   vector<IMethod*>::const_iterator itrMethod = fMethods.begin()+index;
    if (itrMethod<fMethods.end()) return *itrMethod;
    else                          return 0;
 }
@@ -130,7 +130,7 @@ void TMVA::MethodCompositeBase::AddWeightsXMLTo( void* parent ) const
 TMVA::MethodCompositeBase::~MethodCompositeBase( void )
 {
    // delete methods
-   std::vector<IMethod*>::iterator itrMethod = fMethods.begin();
+   vector<IMethod*>::iterator itrMethod = fMethods.begin();
    for (; itrMethod != fMethods.end(); itrMethod++) {
       Log() << kVERBOSE << "Delete method: " << (*itrMethod)->GetName() << Endl;
       delete (*itrMethod);
@@ -180,7 +180,7 @@ void TMVA::MethodCompositeBase::ReadWeightsFromXML( void* wghtnode )
          ((TMVA::MethodBoost*)this)->BookMethod( Types::Instance().GetMethodType( methodTypeName), methodName,  optionString );
       }
       fMethods.push_back(ClassifierFactory::Instance().Create(
-                                                              std::string(methodTypeName),jobName, methodName,DataInfo(),optionString));
+         std::string(methodTypeName),jobName, methodName,DataInfo(),optionString));
 
       fMethodWeight.push_back(methodWeight);
       MethodBase* meth = dynamic_cast<MethodBase*>(fMethods.back());
@@ -206,12 +206,12 @@ void TMVA::MethodCompositeBase::ReadWeightsFromXML( void* wghtnode )
 }
 
 //_______________________________________________________________________
-void  TMVA::MethodCompositeBase::ReadWeightsFromStream( std::istream& istr )
+void  TMVA::MethodCompositeBase::ReadWeightsFromStream( istream& istr )
 {
    // text streamer
    TString var, dummy;
    TString methodName, methodTitle=GetMethodName(),
-      jobName=GetJobName(),optionString=GetOptions();
+    jobName=GetJobName(),optionString=GetOptions();
    UInt_t methodNum; Double_t methodWeight;
    // and read the Weights (BDT coefficients)
    // coverity[tainted_data_argument]
@@ -221,10 +221,10 @@ void  TMVA::MethodCompositeBase::ReadWeightsFromStream( std::istream& istr )
    fMethods.clear();
    fMethodWeight.clear();
    for (UInt_t i=0; i<methodNum; i++) {
-      istr >> dummy >> methodName >>  dummy >> fCurrentMethodIdx >> dummy >> methodWeight;
-      if ((UInt_t)fCurrentMethodIdx != i) {
+      istr >> dummy >> methodName >>  dummy >> fMethodIndex >> dummy >> methodWeight;
+      if ((UInt_t)fMethodIndex != i) {
          Log() << kFATAL << "Error while reading weight file; mismatch MethodIndex="
-               << fCurrentMethodIdx << " i=" << i
+               << fMethodIndex << " i=" << i
                << " MethodName " << methodName
                << " dummy " << dummy
                << " MethodWeight= " << methodWeight
@@ -237,7 +237,7 @@ void  TMVA::MethodCompositeBase::ReadWeightsFromStream( std::istream& istr )
          if (GetMethodType() == Types::kBoost)
             ((TMVA::MethodBoost*)this)->BookMethod( Types::Instance().GetMethodType( methodName), methodTitle,  optionString );
       }
-      else methodTitle=Form("%s (%04i)",GetMethodName().Data(),fCurrentMethodIdx);
+      else methodTitle=Form("%s (%04i)",GetMethodName().Data(),fMethodIndex);
       fMethods.push_back(ClassifierFactory::Instance().Create( std::string(methodName), jobName,
                                                                methodTitle,DataInfo(), optionString) );
       fMethodWeight.push_back( methodWeight );
