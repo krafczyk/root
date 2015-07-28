@@ -20,7 +20,7 @@ excl="main proof/proofd net/rootd net/xrootd rootx \
       bindings/pyroot bindings/ruby math/genetic \
       io/xmlparser graf3d/gl graf3d/ftgl \
       roofit/roostats roofit/histfactory sql/oracle net/netx net/auth \
-      net/rpdutils math/mathmore math/minuit2 io/gfal net/monalisa \
+      net/rpdutils math/minuit2 io/gfal net/monalisa \
       proof/proofx math/fftw gui/qtgsi sql/odbc io/castor math/unuran \
       geom/gdml montecarlo/g4root graf2d/gviz graf3d/gviz3d graf3d/eve \
       net/glite misc/minicern misc/memstat net/bonjour graf2d/fitsio \
