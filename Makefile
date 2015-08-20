@@ -549,6 +549,9 @@ endif
 ifeq ($(BUILDCOCOA),yes)
 STATICEXTRALIBS += -framework Cocoa -framework OpenGL
 endif
+ifneq ($(GSLLIBS),)
+STATICEXTRALIBS += $(GSLLIBS)
+endif
 
 ##### libCore #####
 
@@ -1111,7 +1114,7 @@ staticlib: $(ROOTALIB)
 
 static: $(ROOTA)
 
-$(ROOTA) $(PROOFSERVA): $(ROOTALIB) $(MAKESTATIC) $(STATICOBJLIST)
+$(ROOTA) $(PROOFSERVA): $(ROOTEXEO) $(PROOFSERVO) $(ROOTALIB) $(MAKESTATIC) $(STATICOBJLIST)
 	@$(MAKESTATIC) $(PLATFORM) "$(CXX)" "$(CC)" "$(LD)" "$(LDFLAGS)" \
 	   "$(XLIBS)" "$(SYSLIBS)" "$(STATICEXTRALIBS)" $(STATICOBJLIST)
 
