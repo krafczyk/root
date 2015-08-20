@@ -546,6 +546,9 @@ endif
 ifeq ($(BUILDCOCOA),yes)
 STATICEXTRALIBS += -framework Cocoa -framework OpenGL
 endif
+ifneq ($(GSLLIBS),)
+STATICEXTRALIBS += $(GSLLIBS)
+endif
 
 ##### libCore #####
 
