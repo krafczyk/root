@@ -529,16 +529,21 @@ void TDirectoryFile::Close(Option_t *)
 {
    // -- Delete all objects from memory and directory structure itself.
 
+   Info("Close", "1");
    if (!fList || !fSeekDir) {
       return;
    }
+   Info("Close", "2");
 
    // Save the directory key list and header
    Save();
+   Info("Close", "3");
 
    Bool_t fast = kTRUE;
    TObjLink *lnk = fList->FirstLink();
    while (lnk) {
+
+      Info("Close", "4");
       if (lnk->GetObject()->IsA() == TDirectoryFile::Class()) {fast = kFALSE;break;}
       lnk = lnk->Next();
    }
@@ -547,15 +552,25 @@ void TDirectoryFile::Close(Option_t *)
    // if this dir contains subdirs, we must use the slow option for Delete!
    // we must avoid "slow" as much as possible, in particular Delete("slow")
    // with a large number of objects (eg >10^5) would take for ever.
-   if (fast) fList->Delete();
-   else      fList->Delete("slow");
+   Info("Close", "5");
+   if (fast) {
+           Info("Close", "6");
+	   fList->Delete();
+   } else {
+           Info("Close", "7");
+	   fList->Delete("slow");
+   }
 
    // Delete keys from key list (but don't delete the list header)
+   Info("Close", "8");
    if (fKeys) {
+      Info("Close", "9");
       fKeys->Delete("slow");
    }
 
+   Info("Close", "10");
    CleanTargets();
+   Info("Close", "11");
 }
 
 //______________________________________________________________________________
@@ -1407,21 +1422,28 @@ void TDirectoryFile::Save()
 //*-*-*-*-*-*-*-*-*-*Save recursively all directory keys and headers-*-*-*-*-*
 //*-*                ===============================================
 
+   Info("Save", "1");
    TDirectory::TContext ctxt(this);
+   Info("Save", "2");
 
    SaveSelf();
+   Info("Save", "3");
 
    // recursively save all sub-directories
    if (fList) {
+      Info("Save", "4");
       TObject *idcur;
       TIter    next(fList);
       while ((idcur = next())) {
+         Info("Save", "5");
          if (idcur->InheritsFrom(TDirectoryFile::Class())) {
+            Info("Save", "6");
             TDirectoryFile *dir = (TDirectoryFile*)idcur;
             dir->Save();
          }
       }
    }
+   Info("Save", "7");
 }
 
 //______________________________________________________________________________
@@ -1470,18 +1492,34 @@ void TDirectoryFile::SaveSelf(Bool_t force)
 //    -Call this function
 //    -In process2, use TDirectoryFile::ReadKeys to refresh the directory
 
+   Info("SaveSelf", "1");
    if (IsWritable() && (fModified || force) && fFile) {
+      Info("SaveSelf", "2");
       Bool_t dowrite = kTRUE;
-      if (fFile->GetListOfFree())
+      if (fFile->GetListOfFree()) {
+        Info("SaveSelf", "3");
         dowrite = fFile->GetListOfFree()->First() != 0;
+      }
+      Info("SaveSelf", "4");
       if (dowrite) {
+         Info("SaveSelf", "5");
          TDirectory *dirsav = gDirectory;
-         if (dirsav != this) cd();
+         if (dirsav != this) {
+                 Info("SaveSelf", "6");
+		 cd();
+	 }
+         Info("SaveSelf", "7");
          WriteKeys();          //*-*- Write keys record
+         Info("SaveSelf", "8");
          WriteDirHeader();     //*-*- Update directory record
-         if (dirsav && dirsav != this) dirsav->cd();
+         Info("SaveSelf", "9");
+         if (dirsav && dirsav != this) {
+                 Info("SaveSelf", "10");
+		 dirsav->cd();
+         }
       }
    }
+   Info("SaveSelf", "11");
 }
 
 //______________________________________________________________________________

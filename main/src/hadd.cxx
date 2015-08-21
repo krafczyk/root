@@ -231,7 +231,9 @@ int main( int argc, char **argv )
       }
    }
    merger.SetNotrees(noTrees);
+   cout << "hadd START MERGE" << endl;
    Bool_t status = merger.Merge();
+   cout << "hadd FINISH MERGE" << endl;
 
    if (status) {
       if (verbosity == 1) {

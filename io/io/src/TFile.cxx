@@ -864,92 +864,149 @@ void TFile::Close(Option_t *option)
 
    opt.ToLower();
 
+   Info("Close", "1");
    if (!IsOpen()) return;
 
+   Info("Close", "2");
    if (fIsArchive || !fIsRootFile) {
+      Info("Close", "3");
       FlushWriteCache();
+      Info("Close", "4");
       SysClose(fD);
+      Info("Close", "5");
       fD = -1;
 
-      if (gMonitoringWriter)
+      Info("Close", "6");
+      if (gMonitoringWriter) {
+         Info("Close", "6 1");
          gMonitoringWriter->SendFileCloseEvent(this);
+      }
 
+      Info("Close", "7");
       return;
    }
 
+   Info("Close", "8");
    if (IsWritable()) {
+      Info("Close", "9");
       WriteStreamerInfo();
    }
 
    // Finish any concurrent I/O operations before we close the file handles.
+   Info("Close", "10");
    if (fCacheRead) fCacheRead->Close();
+
+   Info("Close", "11");
    {
+      Info("Close", "12");
       TIter iter(fCacheReadMap);
+      Info("Close", "13");
       TObject *key = 0;
       while ((key = iter()) != 0) {
+         Info("Close", "14");
          TFileCacheRead *cache = dynamic_cast<TFileCacheRead *>(fCacheReadMap->GetValue(key));
+         Info("Close", "15");
          cache->Close();
+         Info("Close", "16");
       }
    }
+   Info("Close", "17");
       
    // Delete all supported directories structures from memory
    // If gDirectory points to this object or any of the nested
    // TDirectoryFile, TDirectoryFile::Close will induce the proper cd.
    fMustFlush = kFALSE; // Make sure there is only one Flush.
+   Info("Close", "18");
    TDirectoryFile::Close();
+   Info("Close", "19");
 
    if (IsWritable()) {
+      Info("Close", "20");
       TFree *f1 = (TFree*)fFree->First();
+      Info("Close", "21");
       if (f1) {
+         Info("Close", "22");
          WriteFree();       //*-*- Write free segments linked list
+         Info("Close", "23");
          WriteHeader();     //*-*- Now write file header ; this forces a Flush/fsync
+         Info("Close", "24");
       } else {
+         Info("Close", "25");
          Flush();
+         Info("Close", "26");
       }
    }
    fMustFlush = kTRUE;
 
+   Info("Close", "27");
    FlushWriteCache();
+   Info("Close", "28");
 
-   if (gMonitoringWriter)
+   if (gMonitoringWriter) {
+      Info("Close", "29");
       gMonitoringWriter->SendFileCloseEvent(this);
+      Info("Close", "30");
+   }
 
+   Info("Close", "31");
    delete fClassIndex;
+   Info("Close", "32");
    fClassIndex = 0;
 
    // Delete free segments from free list (but don't delete list header)
    if (fFree) {
+      Info("Close", "32");
       fFree->Delete();
    }
 
+   Info("Close", "33");
    if (IsOpen()) {
+      Info("Close", "34");
       SysClose(fD);
+      Info("Close", "35");
       fD = -1;
    }
 
+   Info("Close", "36");
    fWritable = kFALSE;
 
    // delete the TProcessIDs
    TList pidDeleted;
    TIter next(fProcessIDs);
    TProcessID *pid;
+   Info("Close", "37");
    while ((pid = (TProcessID*)next())) {
+      Info("Close", "38");
       if (!pid->DecrementCount()) {
-         if (pid != TProcessID::GetSessionProcessID()) pidDeleted.Add(pid);
+         Info("Close", "39");
+         if (pid != TProcessID::GetSessionProcessID()) {
+         	 Info("Close", "40");
+		 pidDeleted.Add(pid);
+	 }
       } else if(opt.Contains("r")) {
+         Info("Close", "41");
          pid->Clear();
       }
    }
+   Info("Close", "42");
    pidDeleted.Delete();
+   Info("Close", "43");
 
    if (!IsZombie()) {
+      Info("Close", "44");
       R__LOCKGUARD2(gROOTMutex);
+      Info("Close", "45");
       gROOT->GetListOfFiles()->Remove(this);
+      Info("Close", "46");
       gROOT->GetListOfBrowsers()->RecursiveRemove(this);
+      Info("Close", "47");
       gROOT->GetListOfClosedObjects()->Add(this);
+      Info("Close", "48");
    } else {
+      Info("Close", "49");
       // If we are a zombie, we are already in the list of closed objects.
    }
+   Info("Close", "50");
 }
 
 //____________________________________________________________________________________

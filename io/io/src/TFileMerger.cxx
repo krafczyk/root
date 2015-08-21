@@ -826,24 +826,32 @@ Bool_t TFileMerger::PartialMerge(Int_t in_type)
    Bool_t result = kTRUE;
    Int_t type = in_type;
    while (result && fFileList->GetEntries()>0) {
+      Info("PartialMerge", "Performing MergeRecursive");
       result = MergeRecursive(fOutputFile, fFileList, type);
+      Info("PartialMerge", "Finished MergeRecursive");
       
       // Remove local copies if there are any
       TIter next(fFileList);
       TFile *file;
       while ((file = (TFile*) next())) {
+         Info("PartialMerge", "1");
          // close the files
          if (file->TestBit(kCanDelete)) file->Close();
          // remove the temporary files
+         Info("PartialMerge", "2");
          if(fLocal) {
+            Info("PartialMerge", "3");
             TString p(file->GetPath());
             // coverity[unchecked_value] Index is return a value with range or NPos to select the whole name. 
             p = p(0, p.Index(':',0));
             gSystem->Unlink(p);
          }
       }
+      Info("PartialMerge", "4");
       fFileList->Clear();
+      Info("PartialMerge", "5");
       if (fExcessFiles->GetEntries() > 0) {
+         Info("PartialMerge", "6");
          // We merge the first set of files in the output,
          // we now need to open the next set and make
          // sure we accumulate into the output, so we 
@@ -852,24 +860,38 @@ Bool_t TFileMerger::PartialMerge(Int_t in_type)
          OpenExcessFiles();         
       }
    }
+   Info("PartialMerge", "7");
    if (!result) {
       Error("Merge", "error during merge of your ROOT files");
    } else {
+      Info("PartialMerge", "8");
       // Close or write is required so the file is complete.
       if (in_type & kIncremental) {
+         Info("PartialMerge", "9");
          fOutputFile->Write("",TObject::kOverwrite);
+         Info("PartialMerge", "10");
       } else {
+         Info("PartialMerge", "11");
          fOutputFile->Close();
+         Info("PartialMerge", "12");
       }
    }
    
+   Info("PartialMerge", "13");
    // Cleanup
    if (in_type & kIncremental) {
+      Info("PartialMerge", "14");
       Clear();
+      Info("PartialMerge", "15");
    } else {
+      Info("PartialMerge", "16");
       fOutputFile->ResetBit(kMustCleanup);
+      Info("PartialMerge", "17");
       SafeDelete(fOutputFile);
+      Info("PartialMerge", "18");
    }
+
+   Info("PartialMerge", "19");
    return result;
 }
 
