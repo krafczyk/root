@@ -324,7 +324,7 @@ TString TMVA::Reader::GetMethodTypeFromFile( const TString& filename )
 {
    // read the method type from the file
 
-   ifstream fin( filename );
+   std::ifstream fin( filename );
    if (!fin.good()) { // file not found --> Error
       Log() << kFATAL << "<BookMVA> fatal error: "
             << "unable to open input weight file: " << filename << Endl;

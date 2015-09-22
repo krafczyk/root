@@ -1009,7 +1009,7 @@ void TMVA::PDF::ReadXML( void* pdfnode )
 }
 
 //_______________________________________________________________________
-ostream& TMVA::operator<< ( ostream& os, const PDF& pdf )
+std::ostream& TMVA::operator<< ( std::ostream& os, const PDF& pdf )
 {
    // write the pdf
    Int_t dp = os.precision();
@@ -1046,7 +1046,7 @@ ostream& TMVA::operator<< ( ostream& os, const PDF& pdf )
 }
 
 //_______________________________________________________________________
-istream& TMVA::operator>> ( istream& istr, PDF& pdf )
+std::istream& TMVA::operator>> ( std::istream& istr, PDF& pdf )
 {
    // read the tree from an istream
    TString devnullS;

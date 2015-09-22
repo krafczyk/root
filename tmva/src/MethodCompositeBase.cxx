@@ -206,7 +206,7 @@ void TMVA::MethodCompositeBase::ReadWeightsFromXML( void* wghtnode )
 }
 
 //_______________________________________________________________________
-void  TMVA::MethodCompositeBase::ReadWeightsFromStream( istream& istr )
+void  TMVA::MethodCompositeBase::ReadWeightsFromStream( std::istream& istr )
 {
    // text streamer
    TString var, dummy;
