@@ -183,7 +183,7 @@ void TMVA::MethodCommittee::WriteStateToFile() const
    std::ofstream* fout = new std::ofstream( fname );
    if (!fout->good()) { // file not found --> Error
       Log() << kFATAL << "<WriteStateToFile> "
-              << "unable to open output  weight file: " << fname << endl;
+              << "unable to open output  weight file: " << fname << std::endl;
    }
    
    WriteStateToStream( *fout );
@@ -370,7 +370,7 @@ void TMVA::MethodCommittee::AddWeightsXMLTo( void* /*parent*/ ) const {
 }
   
 //_______________________________________________________________________
-void  TMVA::MethodCommittee::ReadWeightsFromStream( istream& istr )
+void  TMVA::MethodCommittee::ReadWeightsFromStream( std::istream& istr )
 {
    // read the state of the method from an input stream
 
@@ -514,8 +514,8 @@ const TMVA::Ranking* TMVA::MethodCommittee::CreateRanking()
 void TMVA::MethodCommittee::MakeClassSpecific( std::ostream& fout, const TString& className ) const
 {
    // write specific classifier response
-   fout << "   // not implemented for class: \"" << className << "\"" << endl;
-   fout << "};" << endl;
+   fout << "   // not implemented for class: \"" << className << "\"" << std::endl;
+   fout << "};" << std::endl;
 }
 
 //_______________________________________________________________________
