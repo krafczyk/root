@@ -518,7 +518,7 @@ void TMVA::MethodDT::ReadWeightsFromXML( void* wghtnode)
 }
 
 //_______________________________________________________________________
-void  TMVA::MethodDT::ReadWeightsFromStream( istream& istr )
+void  TMVA::MethodDT::ReadWeightsFromStream( std::istream& istr )
 {
    delete fTree;
    fTree = new DecisionTree();

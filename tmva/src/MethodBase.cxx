@@ -1306,13 +1306,13 @@ void TMVA::MethodBase::ReadStateFromFile()
       gTools().xmlengine().FreeDoc(doc);
    }
    else {
-      filebuf fb;
-      fb.open(tfname.Data(),ios::in);
+      std::filebuf fb;
+      fb.open(tfname.Data(),std::ios::in);
       if (!fb.is_open()) { // file not found --> Error
          Log() << kFATAL << "<ReadStateFromFile> "
                << "Unable to open input weight file: " << tfname << Endl;
       }
-      istream fin(&fb);
+      std::istream fin(&fb);
       ReadStateFromStream(fin);
       fb.close();
    }
@@ -2771,7 +2771,7 @@ void TMVA::MethodBase::MakeClass( const TString& theClassFileName ) const
    Log() << kINFO << "Creating standalone response class: "
          << gTools().Color("lightblue") << classFileName << gTools().Color("reset") << Endl;
 
-   ofstream fout( classFileName );
+   std::ofstream fout( classFileName );
    if (!fout.good()) { // file could not be opened --> Error
       Log() << kFATAL << "<MakeClass> Unable to open file: " << classFileName << Endl;
    }
