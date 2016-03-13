@@ -143,7 +143,9 @@ public:
    /// gradient value at the minimum
    const double * Gradient() const {
       if (fSolver == 0) return 0;
-      gsl_multifit_gradient(fSolver->J, fSolver->f,fVec);
+      gsl_matrix* J = gsl_matrix_alloc(fSolver->f->size, fSolver->x->size);
+      gsl_multifit_gradient(J, fSolver->f,fVec);
+      gsl_matrix_free(J);
       return fVec->data;
    }
 
@@ -154,7 +156,9 @@ public:
       unsigned int npar = fSolver->fdf->p;
       fCov = gsl_matrix_alloc( npar, npar );
       static double kEpsrel = 0.0001;
-      int ret = gsl_multifit_covar(fSolver->J, kEpsrel, fCov);
+      gsl_matrix* J = gsl_matrix_alloc(fSolver->f->size, fSolver->x->size);
+      int ret = gsl_multifit_covar(J, kEpsrel, fCov);
+      gsl_matrix_free(J);
       if (ret != GSL_SUCCESS) return 0;
       return fCov->data;
    }
